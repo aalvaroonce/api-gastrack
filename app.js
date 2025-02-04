@@ -26,7 +26,7 @@ app.use("/api-docs",
 app.use("/api", require("./routes"))  
 
 // Seleccionamos el puerto
-const port= process.env.PORT || 3000
+const port= process.env.PORT || 8000
 
 // Hacemos que el servidor escuche las solicitudes
 app.listen(port, ()=>{

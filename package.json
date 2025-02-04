@@ -19,7 +19,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --forceExit",
-    "start": "npm start"
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
