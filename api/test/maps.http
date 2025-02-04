@@ -1,0 +1,19 @@
+### Obtener la estación de servicio más cercana
+GET http://localhost:3000/api/maps/fuelStationCoordinates?latitude=40.4168&longitude=-3.7038
+Content-Type: application/json
+
+### Obtener una estación de servicio por ID
+GET http://localhost:3000/api/maps/fuelStationId/10000
+Content-Type: application/json
+
+### Obtener múltiples estaciones de servicio por ID (usando body)
+POST http://localhost:3000/api/maps/fuelStationId
+Content-Type: application/json
+
+{
+    "fuelStationIds": ["12", "100", "7"]
+}
+
+### Obtener múltiples estaciones de servicio por ID (usando query params)
+POST http://localhost:3000/api/maps/fuelStationId?fuelStationIds=["12","100","7"]
+Content-Type: application/json

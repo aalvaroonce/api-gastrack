@@ -56,7 +56,7 @@ const validatorLogin = [
         .isLength({ min: 8, max: 64 }).withMessage("La contraseña debe tener entre 8 y 16 caracteres"),
 
     (req, res, next) => validateResults(req, res, next)
-];
+];  
 
 // Validación para obtener un usuario por su ID
 const validatorGetUser = [

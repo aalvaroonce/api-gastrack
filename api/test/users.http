@@ -1,0 +1,96 @@
+### Registro de usuarios
+POST http://localhost:3000/api/users/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Menganito",
+    "email": "menganitohernandez@test.com",
+    "age": 20,
+    "password": "n0ki3er.0proVa23lc$dIgo",
+    "city": "Madrid",
+    "country": "España"
+}
+
+###
+
+POST http://localhost:3000/api/users/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Pepito",
+    "email": "peitoperez@test.com",
+    "age": 30,
+    "password": "3stoN0.esuN4contr4s3ña",
+    "city": "Barcelona",
+    "country": "España"
+}
+
+###
+
+POST http://localhost:3000/api/users/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Almudena",
+    "email": "almudenagimenez@test.com",
+    "age": 9,
+    "password": "holaef.A1a",
+    "city": "Bilbao",
+    "country": "España"
+}
+
+### Inicio de sesión
+POST http://localhost:3000/api/users/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "menganitohernandez@test.com",
+    "password": "n0ki3er.0proVa23lc$dIgo"
+}
+
+### Inicio de sesión ADMIN
+POST http://localhost:3000/api/users/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "peitoperez@test.com",
+    "password": "3stoN0.esuN4contr4s3ña"
+}
+
+### Obtener todos los usuarios (solo admin)
+GET http://localhost:3000/api/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2EyNzA0Y2RjMGUwZDYyNGQ3ODBmMmYiLCJyb2xlIjoidXNlciIsImlhdCI6MTczODY5ODgyOSwiZXhwIjoxNzM4Nzg1MjI5fQ.DxhAMv_RsR1UE3DryhdY0aivARRlo3sjQixG4H7CZ2M
+
+### Obtener usuario por ID
+GET http://localhost:3000/api/users/6717c999d065ac2a9d4f0b94
+Content-Type: application/json
+Authorization: Bearer <TOKEN_VALIDO>
+
+### Actualizar usuario (solo el propio o admin)
+PUT http://localhost:3000/api/users/673cb1c25c3fdb2aaf951ba4 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer <TOKEN_VALIDO>
+
+{
+    "name": "Menganito",
+    "email": "menganitohernandez@test.com",
+    "age": 64,
+    "city": "Madrid",
+    "country": "España"
+}
+s
+### Borrado lógico de usuario
+DELETE http://localhost:3000/api/users/6717ca80d065ac2a9d4f0b9f?logic=true
+Content-Type: application/json
+Authorization: Bearer <TOKEN_VALIDO>
+
+### Restaurar usuario eliminado lógicamente
+PUT http://localhost:3000/api/users/restore/6717ca80d065ac2a9d4f0b9f
+Content-Type: application/json
+Authorization: Bearer <TOKEN_VALIDO>
+
+### Eliminación física de usuario (solo admin)
+DELETE http://localhost:3000/api/users/671fb460afda9b6f5ac5576e?logic=false
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2EyNzA0Y2RjMGUwZDYyNGQ3ODBmMmYiLCJyb2xlIjoidXNlciIsImlhdCI6MTczODY5ODgyOSwiZXhwIjoxNzM4Nzg1MjI5fQ.DxhAMv_RsR1UE3DryhdY0aivARRlo3sjQixG4H7CZ2M
