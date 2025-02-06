@@ -1,9 +1,9 @@
 // Importamos el módulo express
 const express = require("express")
-const { registerCtrl, loginCtrl, updateUser, getUsers, deleteUser, getUser, restoreUser } = require("../controllers/users")
-const { validatorRegister, validatorLogin, validatorGetUser, validatorUpdateUser, validatorRestoreUser, validatorDeleteUser } = require("../validators/users")
+const { registerCtrl, loginCtrl, updateUser, getUsers, deleteUser, getUser, restoreUser, changePassword } = require("../controllers/users")
+const { validatorRegister, validatorLogin, validatorGetUser, validatorUpdateUser, validatorRestoreUser, validatorDeleteUser, validatorChangePassword } = require("../validators/users")
 const {authMiddleware} = require("../middleware/session")
-const { checkRol, checkUserRol, checkUserId } = require("../middleware/rol")
+const { checkRol, checkUserId } = require("../middleware/rol")
 // Creamos una nueva instancia del Router de express para manejar las rutas
 const router = express.Router()
 
@@ -45,7 +45,7 @@ router.get("/", authMiddleware, checkRol(["admin"]), getUsers)
  *      responses:
  *          '200':
  *              description: Returns the inserted object
- *          '403':
+ *          '400':
  *              description: Validation error
  *          '404':
  *              description: Not found error
@@ -72,7 +72,7 @@ router.get("/:id", authMiddleware, checkRol(["admin"]), validatorGetUser, getUse
  *      responses:
  *          '200':
  *              description: Returns the inserted object
- *          '403':
+ *          '400':
  *              description: Validation error
  *          '404':
  *              description: Not found error
@@ -97,7 +97,7 @@ router.post("/register", validatorRegister, registerCtrl)
  *      responses:
  *          '200':
  *              description: Returns the inserted object
- *          '403':
+ *          '400':
  *              description: Validation error
  *          '404':
  *              description: Not found error
@@ -129,7 +129,7 @@ router.post("/login", validatorLogin, loginCtrl)
  *      responses:
  *          '200':
  *              description: Returns the inserted object
- *          '403':
+ *          '400':
  *              description: Validation error
  *          '404':
  *              description: Not found error
@@ -138,7 +138,7 @@ router.post("/login", validatorLogin, loginCtrl)
  *      security:
  *          - bearerAuth: []
  */
-router.put("/:id", authMiddleware, checkUserRol(["admin"]), checkUserId(["admin"]), validatorUpdateUser, updateUser)
+router.put("/:id", authMiddleware, checkUserId(["admin"]), validatorUpdateUser, updateUser)
 
 /**
  * @openapi
@@ -158,7 +158,7 @@ router.put("/:id", authMiddleware, checkUserRol(["admin"]), checkUserId(["admin"
  *      responses:
  *          '200':
  *              description: Returns the inserted object
- *          '403':
+ *          '400':
  *              description: Validation error
  *          '404':
  *              description: Not found error
@@ -168,6 +168,52 @@ router.put("/:id", authMiddleware, checkUserRol(["admin"]), checkUserId(["admin"
  *          - bearerAuth: []
  */
 router.put("/restore/:id", authMiddleware, checkRol(["admin"]), validatorRestoreUser, restoreUser)
+
+/**
+ * @openapi
+ * /api/users/changepswd/{id}:
+ *  post:
+ *      tags:
+ *      - user
+ *      summary: Change password for a user
+ *      description: Allows a user to update its password by verifying the current password.
+ *      parameters:
+ *          - name: id
+ *            in: path
+ *            description: id of the user for which the password is being changed
+ *            required: true
+ *            schema:
+ *              type: string
+ *      requestBody:
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          currentPassword:
+ *                              type: string
+ *                              example: OldPassword123
+ *                          newPassword:
+ *                              type: string
+ *                              example: NewPassword456
+ *                      required:
+ *                          - currentPassword
+ *                          - newPassword
+ *      responses:
+ *          '200':
+ *              description: Password successfully changed
+ *          '401':
+ *              description: Unauthorized - Incorrect current password    
+ *          '404':
+ *              description: User not found
+ *          '400':
+ *              description: Validation error    
+ *          '500':
+ *              description: Server error
+ *      security:
+ *          - bearerAuth: []
+ */
+router.put("/changepswd/:id", authMiddleware, validatorChangePassword, changePassword);
 
 /**
  * @openapi
@@ -187,7 +233,7 @@ router.put("/restore/:id", authMiddleware, checkRol(["admin"]), validatorRestore
  *      responses:
  *          '200':
  *              description: Returns the status
- *          '403':
+ *          '400':
  *              description: Validation error
  *          '404':
  *              description: Not found error

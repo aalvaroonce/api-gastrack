@@ -124,9 +124,39 @@ const validatorDeleteUser = [
     (req, res, next) => validateResults(req, res, next)
 ];
 
+const validatorChangePassword = [
+    check("id")
+        .exists().withMessage("El ID es requerido")
+        .notEmpty().withMessage("El campo ID no puede estar vacío")
+        .isMongoId().withMessage("Debe ser un ID válido de MongoDB"),
+
+    check("currentPassword")
+        .exists().withMessage("La contraseña es obligatoria")
+        .notEmpty().withMessage("El campo contraseña no puede estar vacío")
+        .isLength({ min: 8, max: 64 }).withMessage("La contraseña debe tener entre 8 y 64 caracteres")
+        .matches(/[A-Z]/).withMessage("La contraseña debe contener al menos una letra mayúscula")
+        .matches(/[a-z]/).withMessage("La contraseña debe contener al menos una letra minúscula")
+        .matches(/[0-9]/).withMessage("La contraseña debe contener al menos un número")
+        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage("La contraseña debe contener al menos un carácter especial"),
+
+    check("newPassword")
+        .exists().withMessage("La contraseña es obligatoria")
+        .notEmpty().withMessage("El campo contraseña no puede estar vacío")
+        .isLength({ min: 8, max: 64 }).withMessage("La contraseña debe tener entre 8 y 64 caracteres")
+        .matches(/[A-Z]/).withMessage("La contraseña debe contener al menos una letra mayúscula")
+        .matches(/[a-z]/).withMessage("La contraseña debe contener al menos una letra minúscula")
+        .matches(/[0-9]/).withMessage("La contraseña debe contener al menos un número")
+        .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage("La contraseña debe contener al menos un carácter especial"),
+
+
+    (req, res, next) => {
+        return validateResults(req, res, next);
+    }
+];
+
 module.exports = { 
     validatorRegister, validatorLogin, 
     validatorGetUser, 
-    validatorUpdateUser, validatorRestoreUser, 
+    validatorUpdateUser, validatorRestoreUser, validatorChangePassword,
     validatorDeleteUser 
 };

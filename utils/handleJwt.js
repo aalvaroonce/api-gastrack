@@ -9,10 +9,7 @@ const userTokenSign = (user) => {
             _id: user._id,
             role: user.role
         },
-            JWT_SECRET,
-        {
-            expiresIn: "24h"
-        }
+            JWT_SECRET
     )
     return sign
 

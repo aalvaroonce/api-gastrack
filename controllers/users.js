@@ -1,15 +1,19 @@
 const { matchedData } = require("express-validator")
-const { userTokenSign } = require("../utils/handleJwt")
+const { userTokenSign, bizTokenSign } = require("../utils/handleJwt")
 const { encrypt, compare } = require("../utils/handlePassword")
-const { usersModel } = require("../models")
+const { usersModel, businessModel } = require("../models")
 
 const getUsers = async (req, res) => {
-    const { upwards } = req.query; // Obtenemos la query de la URL
-    const {user}= req
+    const { upwards, deleted } = req.query; // Obtenemos los parámetros de la URL
 
-    // Validamos que el parámetro 'upwards' sea 'true', 'false' o no esté presente
+    // Validamos que 'upwards' tenga un valor válido o esté ausente
     if (upwards !== undefined && upwards !== "true" && upwards !== "false") {
-        return res.status(400).send({message: "Inserte una query correcta (upwards=true o upwards=false)"});
+        return res.status(400).send({ message: "Inserte una query correcta (upwards=true o upwards=false)" });
+    }
+
+    // Validamos que 'deleted' tenga un valor válido o esté ausente
+    if (deleted !== undefined && deleted !== "true" && deleted !== "false") {
+        return res.status(400).send({ message: "Inserte una query correcta (deleted=true o deleted=false)" });
     }
 
     // Definimos sortOrder en función de cómo se quieran pasar los datos
@@ -18,15 +22,26 @@ const getUsers = async (req, res) => {
                     :null;
 
     try {
-        // Buscar los usuarios, si sortOrder está definido, se ordenan, de lo contrario no se aplica orden
-        const users = await usersModel.find({}).sort(sortOrder ? { name: sortOrder } : {});
+        let users;
 
+        if (deleted === "true") {
+            users = await usersModel.findDeleted().sort(sortOrder ? { _id: sortOrder } : {});
+        } else if (deleted === "false") {
+            // Buscar solo documentos no eliminados
+            users = await usersModel.find().sort(sortOrder ? { _id: sortOrder } : {});
+        } else {
+            users = await usersModel.findWithDeleted().sort(sortOrder ? { _id: sortOrder } : {});
+        }
         // Determinar el mensaje según el valor de 'upwards'
-        const message = sortOrder === 1 ? "Usuarios ordenadas ascendentemente (por nombre)" 
-                        : sortOrder === -1 ? "Usuarios ordenadas descendentemente (por nombre)" 
-                        : "Todas las usuarios actualmente activas";
+        const message = `${sortOrder === 1 ? "Usuarios ordenados ascendentemente (por id)"
+                            : sortOrder === -1 ? "Usuarios ordenados descendentemente (por id)"
+                            : "Usuarios"}${
+                                deleted === "true" ? " eliminadas"
+                                : deleted === "false" ? " activas"
+                                : ""
+        }`;
 
-        res.status(200).send({ message: message, users: users, token: user });
+        res.status(200).send({ message: message, users: users });
     } 
     catch (err) {
         // Control de errores, en caso de fallo en el código
@@ -62,7 +77,7 @@ const registerCtrl = async (req, res) =>{
 
     try{
         const password = await encrypt(req.password)
-        const body = {...req, password}
+        const body = {...req, password} // Con "..." duplicamos el objeto y le añadimos o sobreescribimos una propiedad
         const dataUser = await usersModel.create(body)
 
         dataUser.set('password', undefined, { strict: false })
@@ -72,7 +87,7 @@ const registerCtrl = async (req, res) =>{
             user: dataUser
         }
 
-        // Enviar el user elegido
+        // Enviar el user elegida
         res.status(200).send({ message: "Registrado correctamente", data: data }); 
     }
     catch(err){
@@ -87,9 +102,12 @@ const loginCtrl = async (req, res) => {
         // Intentar encontrar un usuario por email en usersModel
         let user = await usersModel.findOne({ email: req.email });
 
+        // Si no encuentra un usuario, buscar en businessModel
         if (!user) {
-            return res.status(404).send({ message: "Usuario no existente" });
-    
+            user = await businessModel.findOne({ email: req.email });
+            if (!user) {
+                return res.status(404).send({ message: "Usuario no existente" });
+            }
         }
 
         // Validar contraseña
@@ -109,14 +127,51 @@ const loginCtrl = async (req, res) => {
         };
 
         return res.status(200).send({ message: "Logeado correctamente", data });
-
     } catch (err) {
-        
         console.error("Error en login:", err);
-        res.status(500).send({message: "Error al procesar la solicitud de inicio de sesión", error: err.message,});
+        return res.status(500).send({
+            message: "Error al procesar la solicitud de inicio de sesión",
+            error: err.message,
+        });
     }
 };
 
+
+const changePassword= async (req, res) =>{
+    const {id} = req.params
+    const {currentPassword, newPassword} = matchedData(req)
+    console.log("Datos recibidos en el servidor:", req.params.id, req.body);
+
+    try {
+
+        // Intentar encontrar un usuario por email en usersModel
+        let user = await usersModel.findOne({ _id: id });
+
+        // Si no encuentra un usuario, buscar en usersModel
+        if (!user) {
+            return res.status(404).send({ message: "Usuario no existente" });
+        }
+
+        const hashPassword = user.password;
+        const isPasswordValid = await compare(currentPassword, hashPassword);
+
+        if (!isPasswordValid) {
+            return res.status(401).send({ message: "Contraseña antigua incorrecta" });
+        }
+        else{
+            const newPasswordHashed= await encrypt(newPassword)
+            await usersModel.findOneAndUpdate({ _id: id }, {password: newPasswordHashed}, { new: true });
+            return res.status(200).send({ message: "Contraseña correcta", data: true });
+        }
+    } catch (err) {
+        console.error("Error en el cambio de contraseña:", err);
+        return res.status(500).send({
+            message: "Error al comprobar y añadir la contraseña",
+            error: err.message,
+        });
+    }
+
+}
 
 const updateUser = async (req, res) => {
     const { id, ...body } = matchedData(req); // Obtener los datos del cuerpo de la solicitud y el id de la URL
@@ -162,7 +217,13 @@ const restoreUser = async (req, res) => {
         }
 
         // Restaurar el documento que ha sido eliminado lógicamente
-        const restoredUser = await usersModel.restore({ _id: id }); 
+        await usersModel.restore({ _id: id }); 
+
+        const restoredUser = await usersModel.findOneAndUpdate(
+            { _id: id },
+            { deleted: false },
+            { new: true } 
+        );
 
         // Enviar user restaurado
         res.status(200).send({ message: "Usuario restaurado", data: restoredUser });
@@ -221,4 +282,9 @@ const deleteUser = async (req, res) => {
 
 
 
-module.exports = { registerCtrl, loginCtrl, updateUser, getUsers, deleteUser, getUser, restoreUser }
+module.exports = { 
+    registerCtrl, loginCtrl,
+    updateUser, getUsers,
+    getUser, restoreUser, changePassword,
+    deleteUser
+ }
