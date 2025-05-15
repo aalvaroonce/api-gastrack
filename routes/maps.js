@@ -1,6 +1,10 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { fuelStationCoordinates, getFuelStationsByIds } = require("../controllers/maps.js");
+const {
+    fuelStationCoordinates,
+    getFuelStationById,
+    getFuelStationsByIds
+} = require('../controllers/maps.js');
 
 /**
  * @openapi
@@ -29,7 +33,7 @@ const { fuelStationCoordinates, getFuelStationsByIds } = require("../controllers
  *          '500':
  *              description: Server error
  */
-router.get("/fuelStationCoordinates", fuelStationCoordinates);
+router.get('/fuelStationCoordinates', fuelStationCoordinates);
 
 /**
  * @openapi
@@ -53,7 +57,7 @@ router.get("/fuelStationCoordinates", fuelStationCoordinates);
  *          '500':
  *              description: Server error
  */
-router.get("/fuelStationId/:id", (req, res) => { getFuelStationsByIds([req.params.id], res) });
+router.get('/fuelStationId/:id', getFuelStationById);
 
 /**
  * @openapi
@@ -88,12 +92,12 @@ router.get("/fuelStationId/:id", (req, res) => { getFuelStationsByIds([req.param
  *          '500':
  *              description: Server error
  */
-router.post("/fuelStationId", (req, res) => {
+router.post('/fuelStationId', (req, res) => {
     const bodyIds = req.body.fuelStationIds?.map(id => id.toString());
-    const paramIds = JSON.parse(req.query.fuelStationIds ?? "null")?.map(id => id.toString());
-    getFuelStationsByIds(bodyIds ?? paramIds, res);
+    const paramIds = JSON.parse(req.query.fuelStationIds ?? 'null')?.map(id => id.toString());
+
+    const ids = bodyIds ?? paramIds;
+    getFuelStationsByIds(ids, res);
 });
 
-
-// Exportamos el router
 module.exports = router;

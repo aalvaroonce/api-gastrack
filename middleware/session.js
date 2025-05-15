@@ -1,38 +1,35 @@
-const { verifyToken } = require("../utils/handleJwt")
-const { usersModel, businessModel } = require("../models")
+const { userModel } = require('../models');
+const { verifyToken } = require('../utils/handleToken');
+const { handleHttpError } = require('../utils/handleError');
 
 const authMiddleware = async (req, res, next) => {
-
-    try{
-
+    try {
         if (!req.headers.authorization) {
-            res.status(401).send({ message: "Es necesario introducir el token" })
-            return
+            res.status(401).send('AUTHORIZATION_TOKEN_NEEDED');
+            return;
         }
 
-        // Nos llega la palabra reservada Bearer (es un estándar) y el Token, así que me quedo con la última parte
-        const token = req.headers.authorization.split(' ').pop()
+        const token = req.headers.authorization?.split(' ').pop() || req.query.token;
 
-        //Del token, miramos en Payload (revisar verifyToken de utils/handleJwt)
-        const dataToken = await verifyToken(token)
+        if (!token) return handleHttpError(res, 'NOT_TOKEN', 401);
 
-        if(!dataToken._id) {
-            return res.status(401).send({ message: "El token no posee id" })
-        }
+        // Del token, miramos en Payload (revisar verifyToken de utils/handleToken)
+        const dataToken = verifyToken(token);
 
-        const user = await usersModel.findById(dataToken._id)
-        req.user = user // Inyecto al user en la petición
+        if (!dataToken || !dataToken._id) return handleHttpError(res, 'ERROR_ID_TOKEN', 401);
 
-        next()
+        const user = await userModel.findById(dataToken._id);
 
+        req.user = user;
+
+        if (!req.body.code && user?.status === 0)
+            return handleHttpError(res, 'USER_NOT_VALIDATED', 401);
+
+        next();
+    } catch (err) {
+        console.log(err);
+        return handleHttpError(res, 'NOT_SESSION', 401);
     }
-    catch(err){
+};
 
-        res.status(401).send({ message: "No ha iniciado sesión" })
-
-    }
-
-}
-
-
-module.exports = {authMiddleware}
+module.exports = authMiddleware;

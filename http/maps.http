@@ -1,5 +1,5 @@
 ### Obtener la estación de servicio más cercana
-GET https://underlying-regan-immune-mvc-a0b35a6c.koyeb.app/api/maps/fuelStationCoordinates?latitude=40.4168&longitude=-3.7038
+GET http://localhost:8000/api/maps/fuelStationCoordinates?latitude=40.464015&longitude=-3.457103&radius=10
 Content-Type: application/json
 
 ### Obtener una estación de servicio por ID

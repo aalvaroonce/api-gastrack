@@ -1,290 +1,219 @@
-const { matchedData } = require("express-validator")
-const { userTokenSign, bizTokenSign } = require("../utils/handleJwt")
-const { encrypt, compare } = require("../utils/handlePassword")
-const { usersModel, businessModel } = require("../models")
+const { matchedData } = require('express-validator');
+const { encrypt, compare } = require('../utils/handlePassword');
+const { usersModel } = require('../models');
+const { uploadToPinata } = require('../utils/handleUploadIPFS');
+const { handleHttpError } = require('../utils/handleError');
 
 const getUsers = async (req, res) => {
     const { upwards, deleted } = req.query; // Obtenemos los parámetros de la URL
 
     // Validamos que 'upwards' tenga un valor válido o esté ausente
-    if (upwards !== undefined && upwards !== "true" && upwards !== "false") {
-        return res.status(400).send({ message: "Inserte una query correcta (upwards=true o upwards=false)" });
+    if (upwards !== undefined && upwards !== 'true' && upwards !== 'false') {
+        return res
+            .status(400)
+            .send({ message: 'Inserte una query correcta (upwards=true o upwards=false)' });
     }
 
     // Validamos que 'deleted' tenga un valor válido o esté ausente
-    if (deleted !== undefined && deleted !== "true" && deleted !== "false") {
-        return res.status(400).send({ message: "Inserte una query correcta (deleted=true o deleted=false)" });
+    if (deleted !== undefined && deleted !== 'true' && deleted !== 'false') {
+        return res
+            .status(400)
+            .send({ message: 'Inserte una query correcta (deleted=true o deleted=false)' });
     }
 
     // Definimos sortOrder en función de cómo se quieran pasar los datos
-    let sortOrder= upwards === "true" ? 1
-                    :upwards === "false" ? -1 
-                    :null;
+    let sortOrder = upwards === 'true' ? 1 : upwards === 'false' ? -1 : null;
 
     try {
         let users;
 
-        if (deleted === "true") {
-            users = await usersModel.findDeleted().sort(sortOrder ? { _id: sortOrder } : {});
-        } else if (deleted === "false") {
+        if (deleted === 'true') {
+            users = await usersModel
+                .findDeleted()
+                .sort(sortOrder ? { _id: sortOrder } : {})
+                .select('-attempt -role -emailCode');
+        } else if (deleted === 'false') {
             // Buscar solo documentos no eliminados
-            users = await usersModel.find().sort(sortOrder ? { _id: sortOrder } : {});
+            users = await usersModel
+                .find()
+                .sort(sortOrder ? { _id: sortOrder } : {})
+                .select('-attempt -role -emailCode');
         } else {
-            users = await usersModel.findWithDeleted().sort(sortOrder ? { _id: sortOrder } : {});
+            users = await usersModel
+                .findWithDeleted()
+                .sort(sortOrder ? { _id: sortOrder } : {})
+                .select('-attempt -role -emailCode');
         }
         // Determinar el mensaje según el valor de 'upwards'
-        const message = `${sortOrder === 1 ? "Usuarios ordenados ascendentemente (por id)"
-                            : sortOrder === -1 ? "Usuarios ordenados descendentemente (por id)"
-                            : "Usuarios"}${
-                                deleted === "true" ? " eliminadas"
-                                : deleted === "false" ? " activas"
-                                : ""
-        }`;
+        const message = `${
+            sortOrder === 1
+                ? 'Usuarios ordenados ascendentemente (por id)'
+                : sortOrder === -1
+                  ? 'Usuarios ordenados descendentemente (por id)'
+                  : 'Usuarios'
+        }${deleted === 'true' ? ' eliminadas' : deleted === 'false' ? ' activas' : ''}`;
 
         res.status(200).send({ message: message, users: users });
-    } 
-    catch (err) {
-        // Control de errores, en caso de fallo en el código
-        res.status(500).send({ message: "Error al obtener los usuarios", error: err.message });
-    }
-}
-
-const getUser= async (req, res) => {
-    const {id} = matchedData(req); // Obtener el id del parámetro de la URL
-    
-    try {
-        
-        // Buscar user por id
-        const user = await usersModel.findById(id)
-
-        // Si no existe 
-        if (!user) {
-            return res.status(404).send({ message: "User no encontrado" });
-        }
-        
-        // Enviar el user elegida
-        res.status(200).send({ message: "User solicitado", data: user }); 
-
     } catch (err) {
-
         // Control de errores, en caso de fallo en el código
-        res.status(500).send({ message: "Error al obtener el user", error: err.message });
-    }
-}
-
-const registerCtrl = async (req, res) =>{
-    req = matchedData(req)
-
-    try{
-        const password = await encrypt(req.password)
-        const body = {...req, password} // Con "..." duplicamos el objeto y le añadimos o sobreescribimos una propiedad
-        const dataUser = await usersModel.create(body)
-
-        dataUser.set('password', undefined, { strict: false })
-        
-        const data = {
-            token: await userTokenSign(dataUser),
-            user: dataUser
-        }
-
-        // Enviar el user elegida
-        res.status(200).send({ message: "Registrado correctamente", data: data }); 
-    }
-    catch(err){
-        res.status(500).send( { message: "Error al registrar el usuario", error: err.message })
-    }
-}
-
-const loginCtrl = async (req, res) => {
-    req = matchedData(req);
-
-    try {
-        // Intentar encontrar un usuario por email en usersModel
-        let user = await usersModel.findOne({ email: req.email });
-
-        // Si no encuentra un usuario, buscar en businessModel
-        if (!user) {
-            user = await businessModel.findOne({ email: req.email });
-            if (!user) {
-                return res.status(404).send({ message: "Usuario no existente" });
-            }
-        }
-
-        // Validar contraseña
-        const hashPassword = user.password;
-        const check = await compare(req.password, hashPassword);
-        if (!check) {
-            return res.status(401).send({ message: "Contraseña incorrecta" });
-        }
-
-        // Quitar la contraseña del objeto para la respuesta
-        user.set("password", undefined, { strict: false });
-
-        // Preparar los datos para la respuesta
-        const data = {
-            token: await userTokenSign(user),
-            user: user,
-        };
-
-        return res.status(200).send({ message: "Logeado correctamente", data });
-    } catch (err) {
-        console.error("Error en login:", err);
-        return res.status(500).send({
-            message: "Error al procesar la solicitud de inicio de sesión",
-            error: err.message,
-        });
+        res.status(500).send({ message: 'Error al obtener los usuarios', error: err.message });
     }
 };
 
-
-const changePassword= async (req, res) =>{
-    const {id} = req.params
-    const {currentPassword, newPassword} = matchedData(req)
-    console.log("Datos recibidos en el servidor:", req.params.id, req.body);
+const getUser = async (req, res) => {
+    const id = req.user._id;
 
     try {
+        // Buscar user por id
+        const user = await usersModel.findById(id);
 
-        // Intentar encontrar un usuario por email en usersModel
-        let user = await usersModel.findOne({ _id: id });
-
-        // Si no encuentra un usuario, buscar en usersModel
+        // Si no existe
         if (!user) {
-            return res.status(404).send({ message: "Usuario no existente" });
+            return res.status(404).send({ message: 'User no encontrado' });
         }
 
+        // Enviar el user elegida
+        res.status(200).send({ message: 'User solicitado', data: user });
+    } catch (err) {
+        // Control de errores, en caso de fallo en el código
+        res.status(500).send({ message: 'Error al obtener el user', error: err.message });
+    }
+};
+
+const changePassword = async (req, res) => {
+    const id = req.user._id;
+    const { currentPassword, newPassword } = matchedData(req);
+
+    try {
+        // Intentar encontrar un usuario por email en userModel
+        let user = await userModel.findOne({ _id: id }).select('+password');
+
+        // Si no encuentra un usuario, buscar en userModel
+        if (!user) {
+            return res.status(404).send({ message: 'USER_NOT_EXISTS' });
+        }
         const hashPassword = user.password;
         const isPasswordValid = await compare(currentPassword, hashPassword);
 
         if (!isPasswordValid) {
-            return res.status(401).send({ message: "Contraseña antigua incorrecta" });
-        }
-        else{
-            const newPasswordHashed= await encrypt(newPassword)
-            await usersModel.findOneAndUpdate({ _id: id }, {password: newPasswordHashed}, { new: true });
-            return res.status(200).send({ message: "Contraseña correcta", data: true });
+            return res.status(401).send({ message: 'LAST_PASSWORD_INCORRECT' });
+        } else {
+            const newPasswordHashed = await encrypt(newPassword);
+            await usersModel.findOneAndUpdate(
+                { _id: id },
+                { password: newPasswordHashed },
+                { new: true }
+            );
+            return res.status(200).send({ message: 'CORRECT_PASSWORD', data: true });
         }
     } catch (err) {
-        console.error("Error en el cambio de contraseña:", err);
-        return res.status(500).send({
-            message: "Error al comprobar y añadir la contraseña",
-            error: err.message,
+        console.error('Error en el cambio de contraseña:', err);
+        return handleHttpError(res, {
+            message: 'Error al comprobar y añadir la contraseña',
+            error: err.message
         });
     }
+};
 
-}
+const addImage = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const fileBuffer = req.file.buffer;
+        const fileName = req.file.originalname;
+        const pinataResponse = await uploadToPinata(fileBuffer, fileName, userId);
+        const ipfsFile = pinataResponse.IpfsHash;
+        const ipfs = `https://${process.env.PINATA_GATEWAY_URL}/ipfs/${ipfsFile}`;
+        const data = await usersModel.updateOne(
+            { _id: userId },
+            { urlToAvatar: ipfs },
+            { new: true }
+        );
+
+        res.status(200).send(data);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('ERROR_ADDING_IMAGE_TO_CLOUD');
+    }
+};
 
 const updateUser = async (req, res) => {
     const { id, ...body } = matchedData(req); // Obtener los datos del cuerpo de la solicitud y el id de la URL
-    
-    try {
 
+    try {
         // Actualizar user por id
-        const updatedUser = await usersModel.findByIdAndUpdate( id , body, { new: true });
-        
+        const updatedUser = await usersModel.updateOne(id, body, { new: true });
+
         // Si no existe
         if (!updatedUser) {
             return res.status(404).send({ message: `User con id: ${id} no encontrado` });
         }
 
-        updatedUser.set("password", undefined, { strict: false });
-        
-        // Enviar el user actualizada 
-        res.status(200).send({ message: "User actualizado", data: updatedUser });
-
+        // Enviar el user actualizada
+        res.status(200).send({ message: 'User actualizado', data: updatedUser });
     } catch (err) {
-
         // Control de errores, en caso de fallo en el código
-        res.status(500).send({ message: "Error al actualizar la user", error: err.message });
+        res.status(500).send({ message: 'Error al actualizar la user', error: err.message });
     }
-}
+};
 
 // Restaurar un user que ha sido eliminado lógicamente
 const restoreUser = async (req, res) => {
-    const {id} = matchedData(req); // Obtener el id de la URL
-
     try {
-        // Primero verificamos si el user existe en la base de datos, incluyendo documentos borrados lógicamente
-        const existingUser = await usersModel.findOneWithDeleted({ _id: id });
-
-        // Si no existe en la base de datos, significa que fue eliminado físicamente
-        if (!existingUser) {
-            return res.status(404).send({ message: `User con id: ${id} no encontrado o eliminado físicamente, no se puede restaurar` });
+        const { id } = matchedData(req);
+        const exist = await userModel.findOneWithDeleted({ _id: id });
+        if (!exist) {
+            return res.status(404).send('USER_NOT_FOUND');
         }
-
-        // Si el documento existe pero no está eliminado lógicamente
-        if (!existingUser.deleted) {
-            return res.status(404).send({ message: "User existente, no necesita ser restaurado" });
+        if (!exist.deleted) {
+            return res.status(404).send('USER_NOT_ELIMMINATED');
         }
-
-        // Restaurar el documento que ha sido eliminado lógicamente
-        await usersModel.restore({ _id: id }); 
-
-        const restoredUser = await usersModel.findOneAndUpdate(
-            { _id: id },
-            { deleted: false },
-            { new: true } 
-        );
-
-        // Enviar user restaurado
-        res.status(200).send({ message: "Usuario restaurado", data: restoredUser });
-
+        const restored = await userModel.restore({ _id: id });
+        res.status(200).send(restored);
     } catch (err) {
-
-        // Control de errores, en caso de fallo en el código
-        res.status(500).send({ message: "Error al restaurar el usuario", error: err.message });
+        console.log(err);
+        res.status(500).send('ERROR_RECOVERING_USER');
     }
 };
 
 const deleteUser = async (req, res) => {
-    const {id} = matchedData(req); // Obtener el id de la URL y el parámetro sobre el borrado
-    const {logic} = req.query
+    try {
+        const id = req.user._id;
+        const { logic } = req.query;
+        if (logic === 'true') {
+            const deleteLogical = await userModel.delete({ _id: id });
+            if (!deleteLogical) {
+                return res.status(404).send(`USER_${id}_NOT_FOUND`);
+            }
+            res.status(200).send(deleteLogical);
+        } else {
+            const userToDelete = await userModel.findOne({ _id: id });
 
-    if (logic == 'true') {
-        try {
-            // Realizar borrado lógico (usando mongoose-delete)
-            const deletedUser = await usersModel.delete({ _id: id });
-
-            // Si no existe
-            if (!deletedUser) {
-                return res.status(404).send({ message: `User con id: ${id} no encontrado`  });
+            if (!userToDelete) {
+                return res.status(404).send('USER_NOT_FOUND');
             }
 
-            // Enviar mensaje de que se ha borrado correctamente la user
-            res.status(200).send({ message: "User eliminado lógicamente" });
-
-        } catch (err) {
-
-            // Control de errores, en caso de fallo en el código
-            res.status(500).send({ message: "Error al ejecutar el borrado lógico", error: err.message });
-        }
-    } 
-    else{
-        try {
-            // Borrado físico de la base de datos
-            const deletedUser = await usersModel.findOneAndDelete({ _id: id });
-            
-            // Si no existe
-            if (!deletedUser) {
-                return res.status(404).send({ message: `User con id: ${id} no encontrado`  });
+            if (userToDelete.urlToAvatar) {
+                const imageCid = userToDelete.urlToAvatar.split('/ipfs/') ? parts[1] : null;
+                deleteFromPinata(imageCid);
             }
-
-            // Enviar mensaje de que se ha borrado correctamente la user
-            res.status(200).send({ message: "User eliminado físicamente" });
-
-        } catch (err) {
-
-            // Control de errores, en caso de fallo en el código
-            res.status(500).send({ message: "Error al ejecutar el borrado físico", error: err.message });
+            const deleted = await userModel.findOneAndDelete({ _id: id });
+            if (!deleted) {
+                return res.status(404).send(`USER_NOT_FOUND_WITH_${id}`);
+            }
+            res.status(200).send(deleted);
         }
+    } catch (err) {
+        console.log(err);
+        handleHttpError(res, 'ERROR_DELETE_USER');
     }
+};
 
-}
-
-
-
-module.exports = { 
-    registerCtrl, loginCtrl,
-    updateUser, getUsers,
-    getUser, restoreUser, changePassword,
-    deleteUser
- }
+module.exports = {
+    updateUser,
+    getUsers,
+    getUser,
+    restoreUser,
+    changePassword,
+    deleteUser,
+    addImage
+};
