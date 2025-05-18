@@ -47,7 +47,15 @@ const UserScheme = new mongoose.Schema(
         notifications: {
             type: Boolean,
             default: true
-        }
+        },
+        gasStatations: [
+            {
+                gasStation: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'gasStation'
+                }
+            }
+        ]
     },
     {
         timestamps: true

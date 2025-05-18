@@ -1,7 +1,7 @@
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODFjYzNmZmMxZDE2NTdlODYxODlhMTYiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0NjcxNTczNiwiZXhwIjoxNzQ5MzA3NzM2fQ.BmN9GG_BphMwlgv4IgPujp2E0aKZLsVIu3YxT3musno
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDc0ODkwMzIsImV4cCI6MTc1MDA4MTAzMn0.Qaa_ufRe9KqFpZpuGe1w7ju2HgbgZmK7eal1qbUg0n0
 
 ### Registro de usuario
-POST http://localhost:8000/api/user/register
+POST http://localhost:8000/api/users/register
 Content-Type: application/json
 
 {
@@ -13,18 +13,18 @@ Content-Type: application/json
 }
 
 ### Validación de email (requiere token de auth)
-PUT http://localhost:8000/api/user/validation-mail
+PUT http://localhost:8000/api/users/validation-mail
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "code": "489116"
+  "code": "838979"
 }
 
 ###
 
 ### Validación de email para recuperar contraseña
-POST http://localhost:8000/api/user/validation
+POST http://localhost:8000/api/users/validation
 Content-Type: application/json
 
 {
@@ -35,10 +35,10 @@ Content-Type: application/json
 ###
 
 ### Login de usuario
-POST http://localhost:8000/api/user/login
+POST http://localhost:8000/api/users/login
 Content-Type: application/json
 
 {
   "email": "alvarodiezz16@gmail.com",
-  "password": "NuevoPassword456."
+  "password": "securePass123."
 }

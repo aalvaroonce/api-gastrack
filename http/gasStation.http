@@ -1,0 +1,44 @@
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDc0ODg2ODYsImV4cCI6MTc1MDA4MDY4Nn0.l-3b9xpaTX-MGslSiP9xQQa0T2hh-c05RWvBUwfe4cY
+@host = http://localhost:8000
+
+### Añadir gasolinera a favoritos
+POST {{host}}/api/gasstation/favorite
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "idEESS": "12345"
+}
+
+### Eliminar gasolinera de favoritos
+DELETE {{host}}/api/gasstation/favorite
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "idEESS": "12345"
+}
+
+### Añadir o actualizar reseña
+POST {{host}}/api/gasstation/review
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "idEESS": "12345",
+  "rating": 4,
+  "comment": "Buena atención y precios competitivos"
+}
+
+### Eliminar reseña
+DELETE {{host}}/api/gasstation/review
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "idEESS": "12345"
+}
+
+### Obtener gasolinera con historial
+GET {{host}}/api/gasstation/12345
+Authorization: Bearer {{token}}

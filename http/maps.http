@@ -1,5 +1,5 @@
 ### Obtener la estación de servicio más cercana
-GET http://localhost:8000/api/maps/fuelStationCoordinates?latitude=40.464015&longitude=-3.457103&radius=10
+GET http://localhost:8000/api/maps/fuelStationCoordinates?latitude=40.464015&longitude=-3.457103&radius=5
 Content-Type: application/json
 
 ### Obtener una estación de servicio por ID

@@ -166,7 +166,9 @@ const validatorUpdateUser = [
     check('surnames').optional(),
     check('phoneNumber').optional(),
     check('notifications').optional(),
-    (req, res, next) => validateResults(req, res, next)
+    (req, res, next) => {
+        return validateResults(req, res, next);
+    }
 ];
 
 module.exports = {
