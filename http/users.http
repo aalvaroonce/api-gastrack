@@ -5,10 +5,7 @@ Content-Type: application/json
 {
     "name": "Menganito",
     "email": "menganitohernandez@test.com",
-    "age": 20,
-    "password": "n0ki3er.0proVa23lc$dIgo",
-    "city": "Madrid",
-    "country": "España"
+    "password": "n0ki3er.0proVa23lc$dIgo"
 }
 
 ###
@@ -19,10 +16,7 @@ Content-Type: application/json
 {
     "name": "Pepito",
     "email": "peitoperez@test.com",
-    "age": 30,
-    "password": "3stoN0.esuN4contr4s3ña",
-    "city": "Barcelona",
-    "country": "España"
+    "password": "Dan0nino.",
 }
 
 ###
@@ -33,10 +27,7 @@ Content-Type: application/json
 {
     "name": "Almudena",
     "email": "almudenagimenez@test.com",
-    "age": 9,
-    "password": "holaef.A1a",
-    "city": "Bilbao",
-    "country": "España"
+    "password": "holaef.A1a"
 }
 
 ### Inicio de sesión
@@ -75,9 +66,6 @@ Authorization: Bearer <TOKEN_VALIDO>
 {
     "name": "Menganito",
     "email": "menganitohernandez@test.com",
-    "age": 64,
-    "city": "Madrid",
-    "country": "España"
 }
 s
 ### Borrado lógico de usuario

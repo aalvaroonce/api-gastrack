@@ -1,44 +1,66 @@
-// Importamos el modulo de mongoose para interactuar con la base de datos
-const mongoose = require("mongoose")
+const mongoose = require('mongoose');
+const mongooseDelete = require('mongoose-delete');
 
-// Importamos mongoose-delete para poder realizar un borrado lógico
-const mongooseDelete = require("mongoose-delete")
-
-//Definimos el esquema 
-const usersScheme = new mongoose.Schema(
+const UserScheme = new mongoose.Schema(
     {
         name: {
             type: String
         },
+        surnames: {
+            type: String
+        },
         email: {
             type: String,
+            required: true,
             unique: true
         },
+        emailCode: {
+            type: String
+        },
+        attempt: {
+            type: Number,
+            default: 0
+        },
+        phoneNumber: {
+            type: String
+        },
         password: {
-            type: String
+            type: String,
+            select: false
         },
-        age:{
-            type: Number
-        },
-        city: {
-            type: String
-        },
-        country:{
-            type: String
+        status: {
+            type: Number,
+            default: 0
         },
         role: {
             type: String,
             enum: ['user', 'admin'],
             default: 'user'
-        }
+        },
+        urlToAvatar: {
+            type: String
+        },
+        language: {
+            type: String,
+            default: 'es'
+        },
+        notifications: {
+            type: Boolean,
+            default: true
+        },
+        gasStatations: [
+            {
+                gasStation: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'gasStation'
+                }
+            }
+        ]
     },
-        {
-        timestamps: true, 
-        versionKey: false
+    {
+        timestamps: true
     }
+);
 
-)
-
-// Aplicamos el plugin de borrado lógico, sobreescribiendo los métodos habituales de mongoose para que trabajen con el borrado lógico
-usersScheme.plugin(mongooseDelete, {overrideMethods: "all"})
-module.exports = mongoose.model("users", usersScheme) // users es el nombre de la colección en mongoDB
+UserScheme.plugin(mongooseDelete, { overrideMethods: 'all' });
+module.exports = mongoose.model('user', UserScheme);

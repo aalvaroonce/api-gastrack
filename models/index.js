@@ -1,7 +1,9 @@
 // Definimos los modelos con las rutas
 const models = {
-    usersModel: require('./nosql/users')
-    }
-    
+    userModel: require('./nosql/users'),
+    gasStationModel: require('./nosql/gasStation'),
+    gasPriceHistoryModel: require('./nosql/gasPriceHistory')
+};
+
 // Exportamnos los modelos
-module.exports = models
+module.exports = models;

@@ -1,37 +1,30 @@
 // Importamos express
-const express= require("express");
-const swaggerUi = require("swagger-ui-express")
-const swaggerSpecs = require("./docs/swagger.js")
-const cors = require("cors")
+const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./docs/swagger.js');
+const cors = require('cors');
+const dbConnect = require('./config/mongo.js');
+const { startSyncGasStations } = require('./scripts/syncGasStations.js');
+const { startRegisterGasPriceHistory } = require('./scripts/registerGasPriceHistory.js');
 
-// Importamos dotenv
-require("dotenv").config();
+require('dotenv').config();
+const app = express();
 
-// Importamos la conexión con la base de datos
-const dbConnect= require("./config/mongo.js")
-const app= express()
+app.use(express.json());
+app.use(cors());
 
-// Middleware para JSON
-app.use(express.json())
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
-app.use(cors())
+app.use('/api', require('./routes'));
 
-// Definimos el swagger en la /api-docs
-app.use("/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerSpecs)
-)
+const port = process.env.PORT || 8000;
 
-// Montar las rutas
-app.use("/api", require("./routes"))  
+app.listen(port, () => {
+    console.log(`Servidor escuchando en el puerto ${port}`);
+    dbConnect();
+});
 
-// Seleccionamos el puerto
-const port= process.env.PORT || 8000
+startSyncGasStations();
+startRegisterGasPriceHistory();
 
-// Hacemos que el servidor escuche las solicitudes
-app.listen(port, ()=>{
-    console.log(`Servidor escuchando en el puerto ${port}`)
-    dbConnect()
-})
-
-module.exports = app
+module.exports = app;

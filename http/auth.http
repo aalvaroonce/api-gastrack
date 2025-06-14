@@ -1,0 +1,44 @@
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDc0ODkwMzIsImV4cCI6MTc1MDA4MTAzMn0.Qaa_ufRe9KqFpZpuGe1w7ju2HgbgZmK7eal1qbUg0n0
+
+### Registro de usuario
+POST http://localhost:8000/api/users/register
+Content-Type: application/json
+
+{
+  "name": "Juan",
+  "surnames": "Pérez",
+  "email": "alvarodiezz16@gmail.com",
+  "password": "securePass123.",
+  "phoneNumber": "123456789"
+}
+
+### Validación de email (requiere token de auth)
+PUT http://localhost:8000/api/users/validation-mail
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "code": "838979"
+}
+
+###
+
+### Validación de email para recuperar contraseña
+POST http://localhost:8000/api/users/validation
+Content-Type: application/json
+
+{
+  "email": "alvarodiezz16@example.com",
+  "code": "646216"
+}
+
+###
+
+### Login de usuario
+POST http://localhost:8000/api/users/login
+Content-Type: application/json
+
+{
+  "email": "alvarodiezz16@gmail.com",
+  "password": "securePass123."
+}

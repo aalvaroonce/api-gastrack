@@ -1,54 +1,58 @@
-const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const options = {
-
     definition: {
-            openapi: "3.1.0",
+        openapi: '3.1.0',
 
-            info: {
-                title: " Express API with Swagger ",
-                version: "0.1.0",
-                description: "This is a CRUD API application made with Express and documented with Swagger",
+        info: {
+            title: ' Gastrack API ',
+            version: '0.1.0',
+            description: 'The best app if we are talking about gasStations',
 
-                license: {
-                    name: "MIT",
-                    url: "https://spdx.org/licenses/MIT.html",
-                },
-
-                contact: {
-                    name: "Álvaro Caravaca Díez",
-                    url: "https://u-tad.com",
-                    email: "alvaro.caravaca.ceb@immune.institute",
-
-                },
-
+            license: {
+                name: 'MIT',
+                url: 'https://spdx.org/licenses/MIT.html'
             },
 
-            servers: [
+            contact: {
+                name: 'Álvaro Caravaca Díez',
+                url: '',
+                email: 'alvarodiezz16@gmail.com'
+            }
+        },
 
-                {
-                    url: "http://localhost:3000",
-                },
-
-            ],
-            components: {
-                securitySchemes: {
-                    bearerAuth: {
-                        type: "http",
-                        scheme: "bearer"
-                    },
-                },
-                
-                schemas:{
-                    register: require("../schemas/register"),
-                    user: require("../schemas/user"),
-                    login: require("../schemas/login"),
+        servers: [
+            {
+                url: 'https://inclined-bonnibelle-bildyapp-1fff10be.koyeb.app/',
+                description: 'Pre'
             },
+            {
+                url: 'http://localhost:8000',
+                description: 'Local'
+            }
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer'
+                }
+            },
+
+            schemas: {
+                userLogin: require('../schemas/usersLogin'),
+                userRegister: require('../schemas/usersRegister'),
+                userDataLogin: require('../schemas/userDataLogin'),
+                userData: require('../schemas/userData'),
+                userUpdate: require('../schemas/userUpdate'),
+                mailCode: require('../schemas/mailCode'),
+                mailRecover: require('../schemas/mailRecover'),
+                orderUpdateStatus: require('../schemas/orderUpdateStatus')
+            }
         }
     },
 
-    apis: ["./routes/*.js"],
-
+    apis: ['./routes/*.js']
 };
 
-module.exports = swaggerJsdoc(options)
+module.exports = swaggerJsdoc(options);
