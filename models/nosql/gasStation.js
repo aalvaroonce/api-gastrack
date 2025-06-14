@@ -3,9 +3,21 @@ const mongooseDelete = require('mongoose-delete');
 
 const GasStationSchema = new mongoose.Schema(
     {
-        idEESS: { type: String, required: true, unique: true }, // identificador oficial
+        idEESS: { type: String, required: true, unique: true },
         latitude: Number,
         longitude: Number,
+        location: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                required: true,
+                default: 'Point'
+            },
+            coordinates: {
+                type: [Number], // [longitude, latitude]
+                required: true
+            }
+        },
         address: String,
         zipCode: String,
         city: String,
@@ -21,15 +33,10 @@ const GasStationSchema = new mongoose.Schema(
         margin: String,
         bioEthanolPct: String,
         methilEster: String,
+        saved: { type: Boolean, default: false },
         reviews: {
-            scoring: {
-                type: Number,
-                default: 0
-            },
-            totalRatings: {
-                type: Number,
-                default: 0
-            },
+            scoring: { type: Number, default: 0 },
+            totalRatings: { type: Number, default: 0 },
             reviewTexts: [
                 {
                     user: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
@@ -43,5 +50,9 @@ const GasStationSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Índice geoespacial
+GasStationSchema.index({ location: '2dsphere' });
+
 GasStationSchema.plugin(mongooseDelete, { overrideMethods: 'all' });
+
 module.exports = mongoose.model('gasStation', GasStationSchema);

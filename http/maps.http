@@ -17,3 +17,7 @@ Content-Type: application/json
 ### Obtener múltiples estaciones de servicio por ID (usando query params)
 POST https://underlying-regan-immune-mvc-a0b35a6c.koyeb.app/api/maps/fuelStationId?fuelStationIds=["12","100","7"]
 Content-Type: application/json
+
+### Obtener estaciones de servicio más cercanas
+GET http://localhost:8000/api/maps/fuelStationCoordinates?latitude=40.4168&longitude=-3.7038&radius=10&limit=5&fuelType=priceDiesel&brand=REPSOL
+Accept: application/json

@@ -51,12 +51,11 @@ const syncGasStations = async () => {
                 updatedCount++;
             }
         }
+        await gasStationModel.syncIndexes();
 
         console.log(`✅ Sync finished: ${newCount} new, ${updatedCount} updated`);
-        process.exit(0);
     } catch (err) {
         console.error('❌ Error syncing gas stations:', err.message);
-        process.exit(1);
     }
 };
 
@@ -64,6 +63,7 @@ const startSyncGasStations = async () => {
     gasStationIntervalId = setInterval(
         async () => {
             try {
+                console.log('Sync gas stations started');
                 await syncGasStations();
             } catch (err) {
                 console.error('❌ Error syncing gas stations:', err);

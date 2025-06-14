@@ -1,4 +1,4 @@
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDc0ODg2ODYsImV4cCI6MTc1MDA4MDY4Nn0.l-3b9xpaTX-MGslSiP9xQQa0T2hh-c05RWvBUwfe4cY
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDc0ODkwMzIsImV4cCI6MTc1MDA4MTAzMn0.Qaa_ufRe9KqFpZpuGe1w7ju2HgbgZmK7eal1qbUg0n0
 @host = http://localhost:8000
 
 ### Añadir gasolinera a favoritos
@@ -7,7 +7,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "idEESS": "12345"
+  "idEESS": "10483"
 }
 
 ### Eliminar gasolinera de favoritos

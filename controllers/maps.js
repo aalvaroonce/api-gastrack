@@ -4,52 +4,93 @@ const {
     converterToFuelStationDto,
     haversine
 } = require('../utils/handleMaps');
+const { gasStationModel, gasPriceHistoryModel } = require('../models');
 
 const fuelStationCoordinates = async (req, res) => {
-    const actualLat = parseFloat(req.query.latitude);
-    const actualLong = parseFloat(req.query.longitude);
-    const radius = parseFloat(req.query.radius) || 5; // en kilómetros
-    const limit = parseInt(req.query.limit) || null;
-
-    if (isNaN(actualLat) || isNaN(actualLong)) {
-        return res.status(400).send({
-            message: 'Missing or incorrect parameter latitude or longitude'
-        });
-    }
-
     try {
-        const response = await getFuelStationsData();
-        const fuelStationsList = response.data.ListaEESSPrecio;
+        const actualLat = parseFloat(req.query.latitude);
+        const actualLong = parseFloat(req.query.longitude);
+        const radius = parseFloat(req.query.radius) || 5; // km
+        const limit = parseInt(req.query.limit) || null;
+        const fuelType = req.query.fuelType;
+        const brand = req.query.brand;
 
-        // Calcular distancia y filtrar por radio
-        const fuelStationsWithinRadius = fuelStationsList
-            .map(station => {
-                const lat = convertToFloat(station.Latitud);
-                const lon = convertToFloat(station['Longitud (WGS84)']);
-                if (isNaN(lat) || isNaN(lon)) return null;
+        if (isNaN(actualLat) || isNaN(actualLong)) {
+            return res
+                .status(400)
+                .send({ message: 'Missing or incorrect parameter latitude or longitude' });
+        }
 
-                const distance = haversine(actualLat, actualLong, lat, lon);
-                return { ...station, distance };
+        const radiusInMeters = radius * 1000;
+
+        const pipeline = [
+            {
+                $geoNear: {
+                    near: {
+                        type: 'Point',
+                        coordinates: [actualLong, actualLat]
+                    },
+                    distanceField: 'distance',
+                    spherical: true,
+                    maxDistance: radiusInMeters,
+                    query: brand ? { brand: brand.toUpperCase() } : {}
+                }
+            },
+            ...(limit ? [{ $limit: limit }] : [])
+        ];
+
+        const gasStations = await gasStationModel.aggregate(pipeline);
+
+        if (gasStations.length === 0) {
+            return res.status(404).send({ message: 'No gas stations found in radius' });
+        }
+
+        const stationIds = gasStations.map(gs => gs._id);
+
+        const priceDocs = await gasPriceHistoryModel.aggregate([
+            { $match: { gasStation: { $in: stationIds } } },
+            { $sort: { date: -1 } },
+            {
+                $group: {
+                    _id: '$gasStation',
+                    latestPrices: { $first: '$prices' },
+                    latestDate: { $first: '$date' }
+                }
+            }
+        ]);
+
+        const pricesMap = new Map(priceDocs.map(doc => [doc._id.toString(), doc]));
+
+        const results = gasStations
+            .map(gs => {
+                const priceEntry = pricesMap.get(gs._id.toString());
+                if (!priceEntry) return null;
+
+                const price = fuelType
+                    ? priceEntry.latestPrices[fuelType]
+                    : priceEntry.latestPrices;
+
+                if (fuelType && (price === null || price === undefined)) return null;
+
+                return {
+                    id: gs.idEESS,
+                    brand: gs.brand,
+                    address: gs.address,
+                    location: gs.location.coordinates,
+                    distance: Number((gs.distance / 1000).toFixed(2)), // convertir a km
+                    fuelType: fuelType || 'all',
+                    price,
+                    lastUpdated: priceEntry.latestDate
+                };
             })
-            .filter(station => station && station.distance <= radius)
-            .sort((a, b) => a.distance - b.distance);
+            .filter(Boolean);
 
-        const limitedResults = limit
-            ? fuelStationsWithinRadius.slice(0, limit)
-            : fuelStationsWithinRadius;
-
-        const formattedResults = limitedResults.map(fs =>
-            converterToFuelStationDto(fs, fs.distance)
-        );
-
-        console.log(`Found ${formattedResults.length} fuel stations within ${radius}km`);
-
-        res.status(200).send(formattedResults);
+        return res.status(200).send(results);
     } catch (error) {
-        res.status(500).send({
-            message: 'Error retrieving fuel stations',
-            error: error.message
-        });
+        console.error(error);
+        return res
+            .status(500)
+            .send({ message: 'Error retrieving fuel stations', error: error.message });
     }
 };
 

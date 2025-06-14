@@ -8,7 +8,7 @@ const {
 
 /**
  * @openapi
- * /api/fuelStationCoordinates:
+ * /api/maps/fuelStationCoordinates:
  *  get:
  *      tags:
  *      - Fuel Stations

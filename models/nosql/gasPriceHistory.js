@@ -35,4 +35,5 @@ const GasPriceHistorySchema = new mongoose.Schema(
 
 GasPriceHistorySchema.index({ gasStation: 1, date: 1 }, { unique: true }); // una entrada por día por gasolinera
 
+GasPriceHistorySchema.plugin(mongooseDelete, { overrideMethods: 'all' });
 module.exports = mongoose.model('gasPriceHistory', GasPriceHistorySchema);

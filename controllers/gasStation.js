@@ -16,6 +16,7 @@ const saveGasStationToFavorites = async (req, res) => {
             { $addToSet: { gasStatations: { gasStation: station._id } } },
             { new: true }
         );
+        await gasStationModel.findOneAndUpdate({ idEESS: idEESS, saved: true });
 
         res.status(200).send(updatedUser);
     } catch (err) {

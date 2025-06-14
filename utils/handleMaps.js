@@ -31,14 +31,21 @@ const getFuelStationsData = () => {
 };
 
 const converterToFuelStationDto = (fuelStationBase, distanceKm = null) => {
+    const lat = convertToFloat(fuelStationBase.Latitud);
+    const lon = convertToFloat(fuelStationBase['Longitud (WGS84)']);
+
     return {
         address: fuelStationBase['Dirección'],
         zipCode: fuelStationBase['C.P.'],
         city: fuelStationBase.Localidad,
         municipality: fuelStationBase.Municipio,
         province: fuelStationBase.Provincia,
-        latitude: convertToFloat(fuelStationBase.Latitud),
-        longitude: convertToFloat(fuelStationBase['Longitud (WGS84)']),
+        latitude: lat,
+        longitude: lon,
+        location: {
+            type: 'Point',
+            coordinates: [lon, lat] // Mongo espera [longitud, latitud]
+        },
         brand: fuelStationBase['Rótulo'],
         schedule: fuelStationBase.Horario,
         idEESS: fuelStationBase.IDEESS,
