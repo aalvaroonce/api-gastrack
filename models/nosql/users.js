@@ -26,6 +26,7 @@ const UserScheme = new mongoose.Schema(
         vehicles: [
             {
                 default: { type: Boolean, default: false },
+                urlToVehicle: { type: String },
                 brand: { type: String },
                 model: { type: String },
                 year: { type: Number },

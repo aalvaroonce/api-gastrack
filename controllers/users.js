@@ -108,6 +108,16 @@ const addImage = async (req, res) => {
         const userId = req.user._id;
         const fileBuffer = req.file.buffer;
         const fileName = req.file.originalname;
+        const user = userModel.findById(userId);
+
+        if (user.urlToAvatar) {
+            const parts = user.urlToAvatar.split('/ipfs/');
+            if (parts.length === 2) {
+                const previousHash = parts[1];
+                await deleteFromPinata(previousHash).catch(() => {});
+            }
+        }
+
         const pinataResponse = await uploadToPinata(fileBuffer, fileName, userId);
         const ipfsFile = pinataResponse.IpfsHash;
         const ipfs = `https://${process.env.PINATA_GATEWAY_URL}/ipfs/${ipfsFile}`;

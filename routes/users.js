@@ -6,14 +6,15 @@ const {
     deleteUser,
     getUser,
     restoreUser,
-    changePassword
+    changePassword,
+    addImage
 } = require('../controllers/users');
 const {
     validatorRegister,
     validatorLogin,
     validatorGetUser,
     validatorUpdateUser,
-    validatorRestoreUser,
+    validatorId,
     validatorDeleteUser,
     validatorChangePassword,
     validatorEmailCode,
@@ -21,6 +22,7 @@ const {
     validatorEmail
 } = require('../validators/users');
 const authMiddleware = require('../middleware/session');
+const { uploadMiddlewareMemory } = require('../utils/handleStorage');
 const { checkRol, checkUserId } = require('../middleware/rol');
 const {
     registerCtrl,
@@ -287,7 +289,7 @@ router.put('/', authMiddleware, validatorUpdateUser, updateUser);
  *      security:
  *          - bearerAuth: []
  */
-router.put('/restore/:id', authMiddleware, checkRol(['admin']), validatorRestoreUser, restoreUser);
+router.put('/restore/:id', authMiddleware, checkRol(['admin']), validatorId, restoreUser);
 
 /**
  * @openapi
@@ -327,6 +329,46 @@ router.put('/restore/:id', authMiddleware, checkRol(['admin']), validatorRestore
  *          - bearerAuth: []
  */
 router.put('/changepswd', authMiddleware, validatorChangePassword, changePassword);
+
+/**
+ * @openapi
+ * /api/users/addimage:
+ *  patch:
+ *      tags:
+ *      - user
+ *      summary: Add an image to a user
+ *      description: Adds an image to the image array of the specified user by its CIF
+ *      parameters:
+ *          - name: cif
+ *            in: path
+ *            description: CIF of the user to which the image will be added
+ *            required: true
+ *            schema:
+ *              type: string
+ *      requestBody:
+ *          content:
+ *              multipart/form-data:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          image:
+ *                              type: string
+ *                              format: binary
+ *      responses:
+ *          '200':
+ *              description: Successfully added the image
+ *          '400':
+ *              description: Already existing image in db
+ *          '403':
+ *              description: Validation error
+ *          '404':
+ *              description: user not found
+ *          '500':
+ *              description: Server error
+ *      security:
+ *          - bearerAuth: []
+ */
+router.patch('/addimage', authMiddleware, uploadMiddlewareMemory.single('image'), addImage);
 
 /**
  * @openapi

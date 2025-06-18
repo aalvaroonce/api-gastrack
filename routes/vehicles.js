@@ -2,6 +2,8 @@ const express = require('express');
 const { addVehicle, updateVehicle, deleteVehicle } = require('../controllers/vehicles');
 const authMiddleware = require('../middleware/session');
 const { validatorAddVehicle, validatorUpdateVehicle } = require('../validators/vehicles');
+const { validatorId } = require('../validators/users');
+const { uploadMiddlewareMemory } = require('../utils/handleStorage');
 
 const router = express.Router();
 
@@ -37,6 +39,59 @@ const router = express.Router();
  *       - bearerAuth: []
  */
 router.post('/', authMiddleware, validatorAddVehicle, addVehicle);
+
+/**
+ * @openapi
+ * /api/vehicles/{id}/image:
+ *   post:
+ *     tags:
+ *       - Vehicle
+ *     summary: Sube o reemplaza una imagen del vehículo
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del vehículo
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Imagen agregada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: VEHICLE_IMAGE_UPDATED
+ *                 url:
+ *                   type: string
+ *                   example: https://gateway.pinata.cloud/ipfs/Qm...
+ *       404:
+ *         description: Usuario o vehículo no encontrado
+ *       500:
+ *         description: Error en el servidor
+ *     security:
+ *       - bearerAuth: []
+ */
+router.patch(
+    '/:id/image',
+    authMiddleware,
+    validatorId,
+    uploadMiddlewareMemory.single('image'),
+    addImage
+);
 
 /**
  * @openapi

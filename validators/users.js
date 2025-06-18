@@ -67,7 +67,7 @@ const validatorGetUser = [
 ];
 
 // Validación para restaurar un usuario por su ID
-const validatorRestoreUser = [
+const validatorId = [
     check('id')
         .exists()
         .withMessage('El ID es requerido')
@@ -180,6 +180,6 @@ module.exports = {
     validatorChangePassword,
     validatorGetUser,
     validatorUpdateUser,
-    validatorRestoreUser,
+    validatorId,
     validatorDeleteUser
 };
