@@ -53,6 +53,4 @@ const GasStationSchema = new mongoose.Schema(
 // Índice geoespacial
 GasStationSchema.index({ location: '2dsphere' });
 
-GasStationSchema.plugin(mongooseDelete, { overrideMethods: 'all' });
-
 module.exports = mongoose.model('gasStation', GasStationSchema);

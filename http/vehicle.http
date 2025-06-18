@@ -1,0 +1,38 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTAyNDI3MTAsImV4cCI6MTc1MjgzNDcxMH0.4Qp7AN1BpFoE2GNf9Xvi_Cub4dx6uLovcDkGdRGOloE
+@vehicleId = 685295f16655a420928e3588
+
+### Agregar vehículo
+POST http://localhost:8000/api/vehicles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "brand": "Toyota",
+  "model": "Corolla",
+  "year": 2020,
+  "fuelCapacity": 50,
+  "fuelType": "petrol95",
+  "vehicleType": "car",
+  "favoriteGasBrand": "Repsol",
+  "default": true
+}
+
+### Actualizar vehículo 
+PUT http://localhost:8000/api/vehicles/vehicleId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "brand": "Toyota",
+  "model": "Corolla Hybrid",
+  "year": 2021,
+  "fuelCapacity": 45,
+  "fuelType": "petrol95",
+  "vehicleType": "car",
+  "favoriteGasBrand": "Repsol",
+  "default": false
+}
+
+### Eliminar vehículo 
+DELETE http://localhost:8000/api/vehicles/vehicleId
+Authorization: Bearer {{token}}

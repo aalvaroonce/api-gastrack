@@ -9,17 +9,28 @@ const saveGasStationToFavorites = async (req, res) => {
         const { idEESS } = matchedData(req);
 
         const station = await gasStationModel.findOne({ idEESS });
-        if (!station) return res.status(404).send({ message: 'Gasolinera no encontrada' });
+        if (!station) return res.status(404).send('GASSTATION_NOT_FOUND');
+
+        const user = await userModel.findById(userId);
+        const alreadyFavorite = user.gasStatations.some(
+            stationId => stationId.toString() === station._id.toString()
+        );
+        if (alreadyFavorite) return res.status(409).send('GASSTATION_ALREADY_IN_FAVORITES');
 
         const updatedUser = await userModel.updateOne(
             { _id: userId },
-            { $addToSet: { gasStatations: { gasStation: station._id } } },
+            { $addToSet: { gasStatations: station._id } }
+        );
+
+        await gasStationModel.findOneAndUpdate(
+            { idEESS },
+            { $set: { saved: true } },
             { new: true }
         );
-        await gasStationModel.findOneAndUpdate({ idEESS: idEESS, saved: true });
 
         res.status(200).send(updatedUser);
     } catch (err) {
+        console.log(err);
         handleHttpError(res, 'ERROR_SAVING_GASSTATION');
     }
 };

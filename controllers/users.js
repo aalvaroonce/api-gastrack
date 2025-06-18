@@ -1,59 +1,47 @@
 const { matchedData } = require('express-validator');
 const { encrypt, compare } = require('../utils/handlePassword');
-const { usersModel } = require('../models');
+const { userModel } = require('../models');
 const { uploadToPinata } = require('../utils/handleUploadIPFS');
 const { handleHttpError } = require('../utils/handleError');
 
 const getUsers = async (req, res) => {
-    const { upwards, deleted } = req.query; // Obtenemos los parámetros de la URL
+    const { upwards, deleted } = req.query;
 
-    // Validamos que 'upwards' tenga un valor válido o esté ausente
     if (upwards !== undefined && upwards !== 'true' && upwards !== 'false') {
         return res
             .status(400)
             .send({ message: 'Inserte una query correcta (upwards=true o upwards=false)' });
     }
 
-    // Validamos que 'deleted' tenga un valor válido o esté ausente
     if (deleted !== undefined && deleted !== 'true' && deleted !== 'false') {
         return res
             .status(400)
             .send({ message: 'Inserte una query correcta (deleted=true o deleted=false)' });
     }
 
-    // Definimos sortOrder en función de cómo se quieran pasar los datos
     let sortOrder = upwards === 'true' ? 1 : upwards === 'false' ? -1 : null;
 
     try {
         let users;
 
         if (deleted === 'true') {
-            users = await usersModel
+            users = await userModel
                 .findDeleted()
                 .sort(sortOrder ? { _id: sortOrder } : {})
                 .select('-attempt -role -emailCode');
         } else if (deleted === 'false') {
-            // Buscar solo documentos no eliminados
-            users = await usersModel
+            users = await userModel
                 .find()
                 .sort(sortOrder ? { _id: sortOrder } : {})
                 .select('-attempt -role -emailCode');
         } else {
-            users = await usersModel
+            users = await userModel
                 .findWithDeleted()
                 .sort(sortOrder ? { _id: sortOrder } : {})
                 .select('-attempt -role -emailCode');
         }
-        // Determinar el mensaje según el valor de 'upwards'
-        const message = `${
-            sortOrder === 1
-                ? 'Usuarios ordenados ascendentemente (por id)'
-                : sortOrder === -1
-                  ? 'Usuarios ordenados descendentemente (por id)'
-                  : 'Usuarios'
-        }${deleted === 'true' ? ' eliminadas' : deleted === 'false' ? ' activas' : ''}`;
 
-        res.status(200).send({ message: message, users: users });
+        res.status(200).send(users);
     } catch (err) {
         // Control de errores, en caso de fallo en el código
         res.status(500).send({ message: 'Error al obtener los usuarios', error: err.message });
@@ -65,7 +53,7 @@ const getUser = async (req, res) => {
 
     try {
         // Buscar user por id
-        const user = await usersModel.findById(id);
+        const user = await userModel.findById(id);
 
         // Si no existe
         if (!user) {
@@ -99,7 +87,7 @@ const changePassword = async (req, res) => {
             return res.status(401).send({ message: 'LAST_PASSWORD_INCORRECT' });
         } else {
             const newPasswordHashed = await encrypt(newPassword);
-            await usersModel.findOneAndUpdate(
+            await userModel.findOneAndUpdate(
                 { _id: id },
                 { password: newPasswordHashed },
                 { new: true }
@@ -123,7 +111,7 @@ const addImage = async (req, res) => {
         const pinataResponse = await uploadToPinata(fileBuffer, fileName, userId);
         const ipfsFile = pinataResponse.IpfsHash;
         const ipfs = `https://${process.env.PINATA_GATEWAY_URL}/ipfs/${ipfsFile}`;
-        const data = await usersModel.updateOne(
+        const data = await userModel.updateOne(
             { _id: userId },
             { urlToAvatar: ipfs },
             { new: true }
@@ -137,22 +125,20 @@ const addImage = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    const { id, ...body } = matchedData(req); // Obtener los datos del cuerpo de la solicitud y el id de la URL
+    const { body } = matchedData(req);
+    const id = req.user._id;
 
     try {
-        // Actualizar user por id
-        const updatedUser = await usersModel.updateOne(id, body, { new: true });
+        const updatedUser = await userModel.updateOne(id, body, { new: true });
 
-        // Si no existe
         if (!updatedUser) {
-            return res.status(404).send({ message: `User con id: ${id} no encontrado` });
+            return res.status(404).send('USER_NOT_FOUND');
         }
 
-        // Enviar el user actualizada
-        res.status(200).send({ message: 'User actualizado', data: updatedUser });
+        res.status(200).send(updatedUser);
     } catch (err) {
-        // Control de errores, en caso de fallo en el código
-        res.status(500).send({ message: 'Error al actualizar la user', error: err.message });
+        console.log(err);
+        res.status(500).send('ERROR_UPDATING_USER');
     }
 };
 

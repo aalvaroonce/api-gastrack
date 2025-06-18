@@ -5,6 +5,7 @@ const {
     getFuelStationById,
     getFuelStationsByIds
 } = require('../controllers/maps.js');
+const authMiddleware = require('../middleware/session.js');
 
 /**
  * @openapi
@@ -33,7 +34,7 @@ const {
  *          '500':
  *              description: Server error
  */
-router.get('/fuelStationCoordinates', fuelStationCoordinates);
+router.get('/fuelStationCoordinates', authMiddleware, fuelStationCoordinates);
 
 /**
  * @openapi
@@ -57,7 +58,7 @@ router.get('/fuelStationCoordinates', fuelStationCoordinates);
  *          '500':
  *              description: Server error
  */
-router.get('/fuelStationId/:id', getFuelStationById);
+router.get('/fuelStationId/:id', authMiddleware, getFuelStationById);
 
 /**
  * @openapi
@@ -92,7 +93,7 @@ router.get('/fuelStationId/:id', getFuelStationById);
  *          '500':
  *              description: Server error
  */
-router.post('/fuelStationId', (req, res) => {
+router.post('/fuelStationId', authMiddleware, (req, res) => {
     const bodyIds = req.body.fuelStationIds?.map(id => id.toString());
     const paramIds = JSON.parse(req.query.fuelStationIds ?? 'null')?.map(id => id.toString());
 

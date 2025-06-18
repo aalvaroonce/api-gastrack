@@ -47,7 +47,8 @@ const options = {
                 userUpdate: require('../schemas/userUpdate'),
                 mailCode: require('../schemas/mailCode'),
                 mailRecover: require('../schemas/mailRecover'),
-                orderUpdateStatus: require('../schemas/orderUpdateStatus')
+                orderUpdateStatus: require('../schemas/orderUpdateStatus'),
+                vehicleInput: require('../schemas/vehicleInput')
             }
         }
     },

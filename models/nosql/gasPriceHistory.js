@@ -19,15 +19,24 @@ const GasPriceHistorySchema = new mongoose.Schema(
             petrol95: Number,
             petrol95E10: Number,
             petrol95E5Premium: Number,
+            petrol95E25: Number,
+            petrol95E85: Number,
             petrol98: Number,
             petrol98E10: Number,
+            petrolRenovable: Number,
             gpl: Number,
             biodiesel: Number,
             bioethanol: Number,
-            gasNaturalLicuado: Number,
+            biogasNaturalComprimido: Number,
+            biogasNaturalLicuado: Number,
             gasNaturalComprimido: Number,
+            gasNaturalLicuado: Number,
+            dieselRenovable: Number,
             gasoleoB: Number,
-            hydrogen: Number
+            hydrogen: Number,
+            methanol: Number,
+            adblue: Number,
+            amoniaco: Number
         }
     },
     { timestamps: true }

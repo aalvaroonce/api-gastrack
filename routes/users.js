@@ -258,7 +258,7 @@ router.put('/recover-psswd', validatorEmail, recoverPass);
  *      security:
  *          - bearerAuth: []
  */
-router.put('/:id', authMiddleware, checkUserId(['admin']), validatorUpdateUser, updateUser);
+router.put('/', authMiddleware, validatorUpdateUser, updateUser);
 
 /**
  * @openapi
@@ -291,19 +291,12 @@ router.put('/restore/:id', authMiddleware, checkRol(['admin']), validatorRestore
 
 /**
  * @openapi
- * /api/users/changepswd/{id}:
+ * /api/users/changepswd:
  *  post:
  *      tags:
  *      - user
  *      summary: Change password for a user
  *      description: Allows a user to update its password by verifying the current password.
- *      parameters:
- *          - name: id
- *            in: path
- *            description: id of the user for which the password is being changed
- *            required: true
- *            schema:
- *              type: string
  *      requestBody:
  *          content:
  *              application/json:
@@ -333,7 +326,7 @@ router.put('/restore/:id', authMiddleware, checkRol(['admin']), validatorRestore
  *      security:
  *          - bearerAuth: []
  */
-router.put('/changepswd/:id', authMiddleware, validatorChangePassword, changePassword);
+router.put('/changepswd', authMiddleware, validatorChangePassword, changePassword);
 
 /**
  * @openapi
@@ -362,7 +355,6 @@ router.put('/changepswd/:id', authMiddleware, validatorChangePassword, changePas
  *      security:
  *          - bearerAuth: []
  */
-router.delete('/:id', authMiddleware, checkUserId(['admin']), validatorDeleteUser, deleteUser);
+router.delete('/:id', authMiddleware, validatorDeleteUser, deleteUser);
 
-// Exportamos el router para que pueda ser utilizado en otras partes de la aplicación
 module.exports = router;
