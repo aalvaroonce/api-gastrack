@@ -1,10 +1,10 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODFjYzNmZmMxZDE2NTdlODYxODlhMTYiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0NjcxNTczNiwiZXhwIjoxNzQ5MzA3NzM2fQ.BmN9GG_BphMwlgv4IgPujp2E0aKZLsVIu3YxT3musno
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTAyNDI3MTAsImV4cCI6MTc1MjgzNDcxMH0.4Qp7AN1BpFoE2GNf9Xvi_Cub4dx6uLovcDkGdRGOloE
 @admin_token =  
 
 
 
 ### RECOVER TOKEN TO VALIDATE PASSWORD
-PUT http://localhost:8000/api/user/recover-psswd
+PUT http://localhost:8000/api/users/recover-psswd
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### VALIDATE EMAIL TO RECOVER PASSWORD
-PUT http://localhost:8000/api/user/validation-psswd
+PUT http://localhost:8000/api/users/validation-psswd
 Content-Type: application/json
 
 {
@@ -20,12 +20,12 @@ Content-Type: application/json
   "code": "123456"
 }
 
-### GET USER PROFILE (requires token)
-GET http://localhost:8000/api/user/profile
+### GET USERs PROFILE (requires token)
+GET http://localhost:8000/api/users/profile
 Authorization: Bearer {{token}}
 
-### UPDATE USER (requires token)
-PUT http://localhost:8000/api/user/profile
+### UPDATE USERs (requires token)
+PUT http://localhost:8000/api/users/profile
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -34,7 +34,7 @@ Authorization: Bearer {{token}}
 }
 
 ### CHANGE PASSWORD (requires token)
-PUT http://localhost:8000/api/user/changepswd
+PUT http://localhost:8000/api/users/changepswd
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -43,16 +43,16 @@ Authorization: Bearer {{token}}
   "newPassword": "NuevoPassword456."
 }
 
-### DELETE USER (requires token)
-DELETE http://localhost:8000/api/user?logic=true
+### DELETE USERs (requires token)
+DELETE http://localhost:8000/api/users?logic=true
 Authorization: Bearer {{token}}
 
-### RESTORE USER (requires admin token)
-PATCH http://localhost:8000/api/user/restore/USER_ID
+### RESTORE USERs (requires admin token)
+PATCH http://localhost:8000/api/users/restore/USERs_ID
 Authorization: Bearer {{admin_token}}
 
-### ADD IMAGE TO USER (requires token)
-PATCH http://localhost:8000/api/user/addimage
+### ADD IMAGE TO USERs (requires token)
+PATCH http://localhost:8000/api/users/addimage
 Authorization: Bearer {{token}}
 Content-Type: multipart/form-data; boundary=Boundry
 
@@ -62,4 +62,3 @@ Content-Type: image/jpeg
 
 < ./images/cerberus.png
 --Boundry--
-

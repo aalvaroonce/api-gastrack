@@ -8,10 +8,10 @@ function degreesToRadians(degrees) {
 }
 
 const convertToFloat = text => {
-    if (typeof text !== 'string' || text == null) return null;
+    if (typeof text !== 'string' || text == null || text == NaN) return null;
     const cleaned = text.replace(',', '.').replace(/[^\d.-]/g, '');
     const value = parseFloat(cleaned);
-    return isNaN(value) ? NaN : value;
+    return isNaN(value) ? null : value;
 };
 
 const haversine = (lat1, lon1, lat2, lon2) => {
@@ -44,7 +44,7 @@ const converterToFuelStationDto = (fuelStationBase, distanceKm = null) => {
         longitude: lon,
         location: {
             type: 'Point',
-            coordinates: [lon, lat] // Mongo espera [longitud, latitud]
+            coordinates: [lon, lat]
         },
         brand: fuelStationBase['Rótulo'],
         schedule: fuelStationBase.Horario,
@@ -57,20 +57,31 @@ const converterToFuelStationDto = (fuelStationBase, distanceKm = null) => {
         margin: fuelStationBase.Margen,
         bioEthanolPct: fuelStationBase['% BioEtanol'],
         methilEster: fuelStationBase['% Éster metílico'],
-        priceDiesel: convertToFloat(fuelStationBase['Precio Gasoleo A']),
-        priceDieselPremium: convertToFloat(fuelStationBase['Precio Gasoleo Premium']),
-        pricePetrol95: convertToFloat(fuelStationBase['Precio Gasolina 95 E5']),
-        pricePetrol98: convertToFloat(fuelStationBase['Precio Gasolina 98 E5']),
-        priceGPL: convertToFloat(fuelStationBase['Precio Gases licuados del petróleo']),
-        priceHidrogen: convertToFloat(fuelStationBase['Precio Hidrogeno']),
+        priceAdblue: convertToFloat(fuelStationBase['Precio Adblue']),
+        priceAmoniaco: convertToFloat(fuelStationBase['Precio Amoniaco']),
         priceBiodiesel: convertToFloat(fuelStationBase['Precio Biodiesel']),
         priceBioethanol: convertToFloat(fuelStationBase['Precio Bioetanol']),
-        priceGasNaturalLicuado: convertToFloat(fuelStationBase['Precio Gas Natural Licuado']),
+        priceBiogasNaturalComprimido: convertToFloat(
+            fuelStationBase['Precio Biogas Natural Comprimido']
+        ),
+        priceBiogasNaturalLicuado: convertToFloat(fuelStationBase['Precio Biogas Natural Licuado']),
+        priceDieselRenovable: convertToFloat(fuelStationBase['Precio Diésel Renovable']),
         priceGasNaturalComprimido: convertToFloat(fuelStationBase['Precio Gas Natural Comprimido']),
-        pricePetrol95E10: convertToFloat(fuelStationBase['Precio Gasolina 95 E10']),
-        pricePetrol95E5Premium: convertToFloat(fuelStationBase['Precio Gasolina 95 E5 Premium']),
-        pricePetrol98E10: convertToFloat(fuelStationBase['Precio Gasolina 98 E10']),
+        priceGasNaturalLicuado: convertToFloat(fuelStationBase['Precio Gas Natural Licuado']),
+        priceGPL: convertToFloat(fuelStationBase['Precio Gases licuados del petróleo']),
+        priceDiesel: convertToFloat(fuelStationBase['Precio Gasoleo A']),
         priceGasoleoB: convertToFloat(fuelStationBase['Precio Gasoleo B']),
+        priceDieselPremium: convertToFloat(fuelStationBase['Precio Gasoleo Premium']),
+        pricePetrol95E10: convertToFloat(fuelStationBase['Precio Gasolina 95 E10']),
+        pricePetrol95E25: convertToFloat(fuelStationBase['Precio Gasolina 95 E25']),
+        pricePetrol95: convertToFloat(fuelStationBase['Precio Gasolina 95 E5']),
+        pricePetrol95E5Premium: convertToFloat(fuelStationBase['Precio Gasolina 95 E5 Premium']),
+        pricePetrol95E85: convertToFloat(fuelStationBase['Precio Gasolina 95 E85']),
+        pricePetrol98E10: convertToFloat(fuelStationBase['Precio Gasolina 98 E10']),
+        pricePetrol98: convertToFloat(fuelStationBase['Precio Gasolina 98 E5']),
+        pricePetrolRenovable: convertToFloat(fuelStationBase['Precio Gasolina Renovable']),
+        priceHydrogen: convertToFloat(fuelStationBase['Precio Hidrogeno']),
+        priceMethanol: convertToFloat(fuelStationBase['Precio Metanol']),
         distanceKm: distanceKm !== null ? parseFloat(distanceKm.toFixed(2)) : undefined
     };
 };
