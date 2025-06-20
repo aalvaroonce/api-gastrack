@@ -26,7 +26,9 @@ const validatorAddVehicle = [
     check('fuelType').exists().isIn(fuelTypes),
     check('vehicleType').optional().isString(),
     check('favoriteGasBrand').optional().isString(),
+    check('percentToRefuel').optional().isNumeric(),
     check('default').optional().isBoolean(),
+    check('obd').optional().isBoolean(),
     (req, res, next) => {
         return validateResults(req, res, next);
     }
@@ -41,6 +43,7 @@ const validatorUpdateVehicle = [
     check('vehicleType').optional().isString(),
     check('favoriteGasBrand').optional().isString(),
     check('default').optional().isBoolean(),
+    check('percentToRefuel').optional().isNumeric(),
     (req, res, next) => {
         return validateResults(req, res, next);
     }
