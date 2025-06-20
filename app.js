@@ -6,15 +6,18 @@ const cors = require('cors');
 const dbConnect = require('./config/mongo.js');
 const { startSyncGasStations } = require('./scripts/syncGasStations.js');
 const { startRegisterGasPriceHistory } = require('./scripts/registerGasPriceHistory.js');
+const apiLimiter = require('./middleware/rate-limiter.js');
 
 require('dotenv').config();
 const app = express();
+app.set('trust proxy', 1);
+app.use(cors());
 
 app.use(express.json());
-app.use(cors());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
+app.use('/api/', apiLimiter);
 app.use('/api', require('./routes'));
 
 const port = process.env.PORT || 8000;

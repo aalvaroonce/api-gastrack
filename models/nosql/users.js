@@ -26,11 +26,13 @@ const UserScheme = new mongoose.Schema(
         vehicles: [
             {
                 default: { type: Boolean, default: false },
+                obd: { type: Boolean },
                 urlToVehicle: { type: String },
                 brand: { type: String },
                 model: { type: String },
                 year: { type: Number },
                 fuelCapacity: { type: Number }, // litros
+                percentToRefuel: { type: Number },
                 fuelType: {
                     type: String,
                     fuelType: {
