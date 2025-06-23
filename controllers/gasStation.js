@@ -134,10 +134,70 @@ const getGasStationWithHistory = async (req, res) => {
     }
 };
 
+const toggleLikeReview = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { idEESS, reviewId } = matchedData(req);
+
+        const station = await gasStationModel.findOne({ idEESS });
+        if (!station) return res.status(404).send('GASSTATION_NOT_FOUND');
+
+        const review = station.reviews.reviewTexts.id(reviewId);
+        if (!review) return res.status(404).send('REVIEW_NOT_FOUND');
+
+        const hasLiked = review.likes.includes(userId);
+        const hasDisliked = review.dislikes.includes(userId);
+
+        if (hasLiked) {
+            review.likes.pull(userId);
+        } else {
+            if (hasDisliked) review.dislikes.pull(userId);
+            review.likes.push(userId);
+        }
+
+        await station.save();
+        res.status(200).send('LIKE_UPDATED');
+    } catch (err) {
+        console.error(err);
+        handleHttpError(res, 'ERROR_TOGGLING_LIKE');
+    }
+};
+
+const toggleDislikeReview = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { idEESS, reviewId } = matchedData(req);
+
+        const station = await gasStationModel.findOne({ idEESS });
+        if (!station) return res.status(404).send('GASSTATION_NOT_FOUND');
+
+        const review = station.reviews.reviewTexts.id(reviewId);
+        if (!review) return res.status(404).send('REVIEW_NOT_FOUND');
+
+        const hasDisliked = review.dislikes.includes(userId);
+        const hasLiked = review.likes.includes(userId);
+
+        if (hasDisliked) {
+            review.dislikes.pull(userId);
+        } else {
+            if (hasLiked) review.likes.pull(userId);
+            review.dislikes.push(userId);
+        }
+
+        await station.save();
+        res.status(200).send('DISLIKE_UPDATED');
+    } catch (err) {
+        console.error(err);
+        handleHttpError(res, 'ERROR_TOGGLING_DISLIKE');
+    }
+};
+
 module.exports = {
     saveGasStationToFavorites,
     removeGasStationFromFavorites,
     addOrUpdateReview,
     deleteReview,
-    getGasStationWithHistory
+    getGasStationWithHistory,
+    toggleLikeReview,
+    toggleDislikeReview
 };

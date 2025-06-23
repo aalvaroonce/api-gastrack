@@ -165,6 +165,6 @@ router.put('/:id', authMiddleware, validatorUpdateVehicle, updateVehicle);
  *     security:
  *       - bearerAuth: []
  */
-router.delete('/:id', authMiddleware, deleteVehicle);
+router.delete('/:id', authMiddleware, validatorDelete, deleteVehicle);
 
 module.exports = router;

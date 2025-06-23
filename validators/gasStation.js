@@ -17,4 +17,12 @@ const validatorReview = [
     }
 ];
 
-module.exports = { validatorIdEESS, validatorReview };
+const validatorReviewInteraction = [
+    param('idEESS').exists().notEmpty().isString().withMessage('idEESS es requerido'),
+    param('reviewId').exists().isMongoId().withMessage('reviewId debe ser un ID válido'),
+    (req, res, next) => {
+        return validateResults(req, res, next);
+    }
+];
+
+module.exports = { validatorIdEESS, validatorReview, validatorReviewInteraction };
