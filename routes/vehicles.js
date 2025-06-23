@@ -1,7 +1,11 @@
 const express = require('express');
 const { addVehicle, updateVehicle, deleteVehicle, addImage } = require('../controllers/vehicles');
 const authMiddleware = require('../middleware/session');
-const { validatorAddVehicle, validatorUpdateVehicle } = require('../validators/vehicles');
+const {
+    validatorAddVehicle,
+    validatorUpdateVehicle,
+    validatorDelete
+} = require('../validators/vehicles');
 const { validatorId } = require('../validators/users');
 const { uploadMiddlewareMemory } = require('../utils/handleStorage');
 

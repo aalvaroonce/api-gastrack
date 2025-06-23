@@ -8,6 +8,7 @@ const validatorIdEESS = [
         return validateResults(req, res, next);
     }
 ];
+
 const validatorReview = [
     check('idEESS').exists().notEmpty().isString(),
     check('rating').notEmpty().isInt({ min: 1, max: 5 }),
@@ -18,8 +19,8 @@ const validatorReview = [
 ];
 
 const validatorReviewInteraction = [
-    param('idEESS').exists().notEmpty().isString().withMessage('idEESS es requerido'),
-    param('reviewId').exists().isMongoId().withMessage('reviewId debe ser un ID válido'),
+    check('idEESS').exists().notEmpty().isString().withMessage('idEESS es requerido'),
+    check('reviewId').exists().isMongoId().withMessage('reviewId debe ser un ID válido'),
     (req, res, next) => {
         return validateResults(req, res, next);
     }
