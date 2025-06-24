@@ -190,28 +190,49 @@ const fuelStationCoordinates = async (req, res) => {
 
 const getFuelStationById = async (req, res) => {
     const id = req.params.id;
-
-    if (!id) {
-        return res.status(400).send({ error: 'Missing fuel station ID in route params' });
-    }
+    if (!id) return res.status(400).send('Missing fuel station ID in route params');
 
     const { from, to } = req.query;
 
     try {
-        const gasStation = await gasStationModel.findOne({ idEESS: id });
-        if (!gasStation) {
-            return res.status(404).send({ error: 'Fuel station not found in database' });
-        }
+        const gasStation = await gasStationModel.findOne({ idEESS: id }).lean();
+        if (!gasStation) return res.status(404).send('Fuel station not found in database');
 
         const response = await getFuelStationsData();
         const fuelStationsList = response.data.ListaEESSPrecio;
         const fuelStation = fuelStationsList.find(fs => fs.IDEESS === id);
-
-        if (!fuelStation) {
-            return res.status(404).send({ error: 'Fuel station ID not found in external data' });
-        }
+        if (!fuelStation) return res.status(404).send('Fuel station ID not found in external data');
 
         const currentData = converterToFuelStationDto(fuelStation);
+
+        const groupedReviews = { 5: [], 4: [], 3: [], 2: [], 1: [] };
+
+        if (gasStation.reviews?.reviewTexts?.length > 0) {
+            for (const review of gasStation.reviews.reviewTexts) {
+                const rating = review.rating;
+                if (groupedReviews[rating]) {
+                    groupedReviews[rating].push({
+                        _id: review._id,
+                        user: review.user,
+                        comment: review.comment,
+                        rating: review.rating,
+                        createdAt: review.createdAt,
+                        likesCount: review.likes?.length || 0,
+                        dislikesCount: review.dislikes?.length || 0
+                    });
+                }
+            }
+        }
+
+        const stationWithGroupedReviews = {
+            ...gasStation,
+            currentPrices: currentData,
+            reviews: {
+                scoring: gasStation.reviews?.scoring || 0,
+                totalRatings: gasStation.reviews?.totalRatings || 0,
+                groupedReviews
+            }
+        };
 
         const historyQuery = { gasStation: gasStation._id };
         if (from || to) {
@@ -220,22 +241,15 @@ const getFuelStationById = async (req, res) => {
             if (to) historyQuery.date.$lte = new Date(to);
         }
 
-        const priceHistory = await gasPriceHistoryModel
-            .find(historyQuery)
-            .sort({ date: 1 }) // Ordenar cronológicamente
-            .lean();
+        const priceHistory = await gasPriceHistoryModel.find(historyQuery).sort({ date: 1 }).lean();
 
         return res.status(200).send({
-            station: {
-                idEESS: id,
-                ...gasStation.toObject(),
-                currentPrices: currentData
-            },
+            station: stationWithGroupedReviews,
             priceHistory
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).send({ error: `Error retrieving fuel station: ${error.message}` });
+        return res.status(500).send(`Error retrieving fuel station: ${error.message}`);
     }
 };
 
@@ -255,12 +269,12 @@ const getFuelStationsByIds = async (ids, res) => {
         );
 
         if (!filteredFuelStations.length) {
-            return res.status(404).send({ error: 'Fuel station IDs not found' });
+            return res.status(404).send('Fuel station IDs not found');
         }
 
         res.send(filteredFuelStations.map(converterToFuelStationDto));
     } catch (error) {
-        res.status(500).send({ error: `Error retrieving fuel stations: ${error.message}` });
+        res.status(500).send(`Error retrieving fuel stations: ${error.message}`);
     }
 };
 

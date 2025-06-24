@@ -6,9 +6,15 @@ const {
     removeGasStationFromFavorites,
     addOrUpdateReview,
     deleteReview,
-    getGasStationWithHistory
+    getGasStationWithHistory,
+    toggleDislikeReview,
+    toggleLikeReview
 } = require('../controllers/gasStation');
-const { validatorIdEESS, validatorReview } = require('../validators/gasStation');
+const {
+    validatorIdEESS,
+    validatorReview,
+    validatorReviewInteraction
+} = require('../validators/gasStation');
 
 /**
  * @openapi
@@ -143,5 +149,77 @@ router.delete('/review', authMiddleware, validatorIdEESS, deleteReview);
  *         description: Gasolinera no encontrada
  */
 router.get('/:idEESS', authMiddleware, validatorIdEESS, getGasStationWithHistory);
+
+/**
+ * @openapi
+ * /api/gasstations/{idEESS}/reviews/{reviewId}/like:
+ *   put:
+ *     tags:
+ *       - Gas Station
+ *     summary: Dar o quitar like a una reseña
+ *     description: Añade un like a una reseña. Si ya existe, lo elimina. Si hay un dislike, lo quita.
+ *     parameters:
+ *       - name: idEESS
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "12345"
+ *       - name: reviewId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "60f8b85f4c1a462c94c4e2c9"
+ *     responses:
+ *       200:
+ *         description: Like actualizado correctamente
+ *       404:
+ *         description: Gasolinera o reseña no encontrada
+ *     security:
+ *       - bearerAuth: []
+ */
+router.put(
+    '/:idEESS/reviews/:reviewId/like',
+    authMiddleware,
+    validatorReviewInteraction,
+    toggleLikeReview
+);
+
+/**
+ * @openapi
+ * /api/gasstations/{idEESS}/reviews/{reviewId}/dislike:
+ *   put:
+ *     tags:
+ *       - Gas Station
+ *     summary: Dar o quitar dislike a una reseña
+ *     description: Añade un dislike a una reseña. Si ya existe, lo elimina. Si hay un like, lo quita.
+ *     parameters:
+ *       - name: idEESS
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "12345"
+ *       - name: reviewId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "60f8b85f4c1a462c94c4e2c9"
+ *     responses:
+ *       200:
+ *         description: Dislike actualizado correctamente
+ *       404:
+ *         description: Gasolinera o reseña no encontrada
+ *     security:
+ *       - bearerAuth: []
+ */
+router.put(
+    '/:idEESS/reviews/:reviewId/dislike',
+    authMiddleware,
+    validatorReviewInteraction,
+    toggleDislikeReview
+);
 
 module.exports = router;

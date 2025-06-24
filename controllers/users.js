@@ -121,11 +121,7 @@ const addImage = async (req, res) => {
         const pinataResponse = await uploadToPinata(fileBuffer, fileName, userId);
         const ipfsFile = pinataResponse.IpfsHash;
         const ipfs = `https://${process.env.PINATA_GATEWAY_URL}/ipfs/${ipfsFile}`;
-        const data = await userModel.updateOne(
-            { _id: userId },
-            { urlToAvatar: ipfs },
-            { new: true }
-        );
+        const data = await userModel.updateOne({ _id: userId }, { $set: { urlToAvatar: ipfs } });
 
         res.status(200).send(data);
     } catch (err) {
@@ -139,13 +135,14 @@ const updateUser = async (req, res) => {
     const id = req.user._id;
 
     try {
-        const updatedUser = await userModel.updateOne(id, body, { new: true });
+        const user = await userModel.findOne({ _id: id });
 
-        if (!updatedUser) {
+        if (!user) {
             return res.status(404).send('USER_NOT_FOUND');
         }
 
-        res.status(200).send(updatedUser);
+        const result = await userModel.updateOne({ _id: id }, { $set: body });
+        res.status(200).send(result);
     } catch (err) {
         console.log(err);
         res.status(500).send('ERROR_UPDATING_USER');

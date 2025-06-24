@@ -35,6 +35,7 @@ const validatorAddVehicle = [
 ];
 
 const validatorUpdateVehicle = [
+    check('id').exists().isString(),
     check('brand').optional().isString(),
     check('model').optional().isString(),
     check('year').optional().isNumeric(),
@@ -49,7 +50,15 @@ const validatorUpdateVehicle = [
     }
 ];
 
+const validatorDelete = [
+    check('id').exists().isString(),
+    (req, res, next) => {
+        return validateResults(req, res, next);
+    }
+];
+
 module.exports = {
     validatorAddVehicle,
-    validatorUpdateVehicle
+    validatorUpdateVehicle,
+    validatorDelete
 };

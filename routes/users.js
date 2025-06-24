@@ -230,7 +230,7 @@ router.put('/recover-psswd', validatorEmail, recoverPass);
 
 /**
  * @openapi
- * /api/users/{id}:
+ * /api/users/profile:
  *  put:
  *      tags:
  *      - User
@@ -260,7 +260,7 @@ router.put('/recover-psswd', validatorEmail, recoverPass);
  *      security:
  *          - bearerAuth: []
  */
-router.put('/', authMiddleware, validatorUpdateUser, updateUser);
+router.put('/profile', authMiddleware, validatorUpdateUser, updateUser);
 
 /**
  * @openapi
@@ -372,7 +372,7 @@ router.patch('/addimage', authMiddleware, uploadMiddlewareMemory.single('image')
 
 /**
  * @openapi
- * /api/users/{id}:
+ * /api/users/:
  *  delete:
  *      tags:
  *      - User
@@ -397,6 +397,6 @@ router.patch('/addimage', authMiddleware, uploadMiddlewareMemory.single('image')
  *      security:
  *          - bearerAuth: []
  */
-router.delete('/:id', authMiddleware, validatorDeleteUser, deleteUser);
+router.delete('/', authMiddleware, deleteUser);
 
 module.exports = router;

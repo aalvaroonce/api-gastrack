@@ -42,7 +42,9 @@ const GasStationSchema = new mongoose.Schema(
                     user: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
                     rating: { type: Number, min: 1, max: 5 },
                     comment: String,
-                    createdAt: { type: Date, default: Date.now }
+                    createdAt: { type: Date, default: Date.now },
+                    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+                    dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }]
                 }
             ]
         }
