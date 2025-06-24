@@ -117,19 +117,23 @@ const deleteReview = async (req, res) => {
     }
 };
 
-const getGasStationWithHistory = async (req, res) => {
+const getSavedGasStations = async (req, res) => {
     try {
-        const { idEESS } = matchedData(req);
-        const station = await gasStationModel.findOne({ idEESS });
-        if (!station) return res.status(404).send('GASSTATION_NOT_FOUND');
+        const userId = req.user._id;
+        const { name } = req.query;
 
-        const history = await priceHistoryModel
-            .find({ gasStation: station._id })
-            .sort({ date: -1 })
-            .populate('gasStation');
+        const user = await userModel.findById(userId).populate({
+            path: 'gasStatations',
+            match: name ? { brand: { $regex: name, $options: 'i' } } : {}
+        });
 
-        res.status(200).send({ gasStation: station, priceHistory: history });
+        if (!user || !user.gasStatations || user.gasStatations.length === 0) {
+            return res.status(404).send('NOT_SAVED_GASSTATIONS');
+        }
+
+        res.status(200).send(user.gasStatations);
     } catch (err) {
+        console.error(err);
         handleHttpError(res, 'ERROR_FETCHING_STATION_HISTORY');
     }
 };
@@ -197,7 +201,7 @@ module.exports = {
     removeGasStationFromFavorites,
     addOrUpdateReview,
     deleteReview,
-    getGasStationWithHistory,
+    getSavedGasStations,
     toggleLikeReview,
     toggleDislikeReview
 };

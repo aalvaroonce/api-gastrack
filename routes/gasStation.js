@@ -8,7 +8,8 @@ const {
     deleteReview,
     getGasStationWithHistory,
     toggleDislikeReview,
-    toggleLikeReview
+    toggleLikeReview,
+    getSavedGasStations
 } = require('../controllers/gasStation');
 const {
     validatorIdEESS,
@@ -129,7 +130,7 @@ router.delete('/review', authMiddleware, validatorIdEESS, deleteReview);
 
 /**
  * @openapi
- * /api/gasstations/{idEESS}:
+ * /api/gasstations/saveed:
  *   get:
  *     tags:
  *       - Gas Station
@@ -148,7 +149,7 @@ router.delete('/review', authMiddleware, validatorIdEESS, deleteReview);
  *       404:
  *         description: Gasolinera no encontrada
  */
-router.get('/:idEESS', authMiddleware, validatorIdEESS, getGasStationWithHistory);
+router.get('/saved', authMiddleware, getSavedGasStations);
 
 /**
  * @openapi
