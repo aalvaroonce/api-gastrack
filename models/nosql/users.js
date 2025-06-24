@@ -15,6 +15,7 @@ const UserScheme = new mongoose.Schema(
         urlToAvatar: { type: String },
         language: { type: String, default: 'es' },
         notifications: { type: Boolean, default: true },
+        deleted: { type: Boolean, default: false, select: false },
 
         gasStatations: [
             {
@@ -80,5 +81,4 @@ const UserScheme = new mongoose.Schema(
 );
 
 UserScheme.plugin(mongooseDelete, { overrideMethods: 'all' });
-
 module.exports = mongoose.model('user', UserScheme);
