@@ -17,7 +17,7 @@ const addVehicle = async (req, res) => {
         user.vehicles.push(newVehicle);
         await user.save();
 
-        res.status(201).send('VEHICLE_ADDED');
+        res.status(201).send({ message: 'VEHICLE_ADDED', id: newVehicle._id });
     } catch (err) {
         console.error(err);
         handleHttpError(res, 'ERROR_ADDING_VEHICLE', err);
@@ -112,9 +112,39 @@ const addImage = async (req, res) => {
     }
 };
 
+const toggleDefaultVehicle = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { id: vehicleId } = matchedData(req);
+
+        const user = await userModel.findById(userId);
+        if (!user) return res.status(404).send('USER_NOT_FOUND');
+
+        let vehicleFound = false;
+
+        for (let v of user.vehicles) {
+            if (v._id.equals(vehicleId)) {
+                v.default = true;
+                vehicleFound = true;
+            } else {
+                v.default = false;
+            }
+        }
+
+        if (!vehicleFound) return res.status(404).send('VEHICLE_NOT_FOUND');
+
+        await user.save();
+        res.status(200).send('DEFAULT_VEHICLE_UPDATED');
+    } catch (err) {
+        console.error(err);
+        handleHttpError(res, 'ERROR_UPDATING_DEFAULT_VEHICLE', err);
+    }
+};
+
 module.exports = {
     addVehicle,
     updateVehicle,
     deleteVehicle,
-    addImage
+    addImage,
+    toggleDefaultVehicle
 };

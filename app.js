@@ -7,6 +7,7 @@ const dbConnect = require('./config/mongo.js');
 const { startSyncGasStations } = require('./scripts/syncGasStations.js');
 const { startRegisterGasPriceHistory } = require('./scripts/registerGasPriceHistory.js');
 const apiLimiter = require('./middleware/rate-limiter.js');
+const { startLowPriceNotifications } = require('./scripts/lowPriceNotifications.js');
 
 require('dotenv').config();
 const app = express();
@@ -29,5 +30,6 @@ app.listen(port, () => {
 
 startSyncGasStations();
 startRegisterGasPriceHistory();
+startLowPriceNotifications();
 
 module.exports = app;

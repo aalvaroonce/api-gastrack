@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTAyNDI3MTAsImV4cCI6MTc1MjgzNDcxMH0.4Qp7AN1BpFoE2GNf9Xvi_Cub4dx6uLovcDkGdRGOloE
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODVhN2MwNTdkN2ZiMWNhOWZiZjBmMjAiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MDc2MDQ4NiwiZXhwIjoxNzUzMzUyNDg2fQ.XnJBM3cg-nKiBMTv26kjJwPyGLRBzfSxWVllIhiJJ9w
 @admin_token =  
 
 
@@ -44,7 +44,7 @@ Authorization: Bearer {{token}}
 }
 
 ### DELETE USERs (requires token)
-DELETE http://localhost:8000/api/users?logic=true
+DELETE http://localhost:8000/api/users
 Authorization: Bearer {{token}}
 
 ### RESTORE USERs (requires admin token)

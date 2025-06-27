@@ -46,7 +46,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### Obtener una estación de servicio por ID
-GET https://underlying-regan-immune-mvc-a0b35a6c.koyeb.app/api/maps/fuelStationId/10000
+GET https://localhost:8000/api/maps/fuelStationId/10000
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

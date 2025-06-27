@@ -32,17 +32,20 @@ const getNotifications = async (req, res) => {
 };
 
 const updateNotificationStatus = async (req, res) => {
-    const { id, state } = matchedData(req);
+    const { id } = matchedData(req);
     const userId = req.user._id;
     try {
-        const notification = await notificationsModel.findOneAndUpdate(
-            { _id: id, userId },
-            { state },
-            { new: true }
-        );
+        const notification = await notificationsModel.findOne({ _id: id, userId });
+
         if (!notification) {
             return res.status(404).send('NOTIFICATION_NOT_FOUND');
         }
+
+        if (notification.read === false) {
+            notification.read = true;
+            await notification.save();
+        }
+
         res.status(200).send(notification);
     } catch (err) {
         console.error(err);
@@ -65,19 +68,14 @@ const deleteNotification = async (req, res) => {
     }
 };
 
-const setNotification = async (userId, name, message) => {
+const setNotification = async (userId, name, message, info) => {
     try {
         await notificationsModel.create({
             userId,
             name,
-            message
+            message,
+            info
         });
-
-        const user = userModel.findById(userId);
-
-        // if (user.allowNotifications == true) {
-        //     await sendPushNotification(user.token, name, message);
-        // }
     } catch (err) {
         console.error(err);
     }
