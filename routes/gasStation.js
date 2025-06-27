@@ -8,7 +8,8 @@ const {
     deleteReview,
     getGasStationWithHistory,
     toggleDislikeReview,
-    toggleLikeReview
+    toggleLikeReview,
+    getSavedGasStations
 } = require('../controllers/gasStation');
 const {
     validatorIdEESS,
@@ -129,26 +130,19 @@ router.delete('/review', authMiddleware, validatorIdEESS, deleteReview);
 
 /**
  * @openapi
- * /api/gasstations/{idEESS}:
+ * /api/gasstations/saved:
  *   get:
  *     tags:
  *       - Gas Station
- *     summary: Obtener gasolinera con historial de precios
- *     description: Devuelve la información de la gasolinera junto a su historial de precios
- *     parameters:
- *       - name: idEESS
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         example: "12345"
+ *     summary: Obtener gasolineras guardadas
+ *     description: Devuelve la información de las gasolineras guardadas
  *     responses:
  *       200:
- *         description: Información y precios históricos de la gasolinera
+ *         description: Información de la gasolineras
  *       404:
- *         description: Gasolinera no encontrada
+ *         description: Gasolineras no encontradas
  */
-router.get('/:idEESS', authMiddleware, validatorIdEESS, getGasStationWithHistory);
+router.get('/saved', authMiddleware, getSavedGasStations);
 
 /**
  * @openapi

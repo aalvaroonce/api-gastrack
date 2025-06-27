@@ -20,13 +20,6 @@ const validatorUpdateNotificationStatus = [
         .withMessage('El campo ID no puede estar vacío')
         .isMongoId()
         .withMessage('Debe ser un ID válido de MongoDB'),
-    check('state')
-        .exists()
-        .withMessage('El estado de la notificación es requerido')
-        .notEmpty()
-        .withMessage('El campo estado no puede estar vacío')
-        .isString()
-        .withMessage('El estado debe ser un texto'),
     (req, res, next) => validateResults(req, res, next)
 ];
 

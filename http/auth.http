@@ -1,4 +1,4 @@
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDc0ODkwMzIsImV4cCI6MTc1MDA4MTAzMn0.Qaa_ufRe9KqFpZpuGe1w7ju2HgbgZmK7eal1qbUg0n0
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODVhN2MwNTdkN2ZiMWNhOWZiZjBmMjAiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MDc2MDQ4NiwiZXhwIjoxNzUzMzUyNDg2fQ.XnJBM3cg-nKiBMTv26kjJwPyGLRBzfSxWVllIhiJJ9w
 
 ### Registro de usuario
 POST http://localhost:8000/api/users/register
@@ -18,7 +18,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "code": "838979"
+  "code": "184355"
 }
 
 ###
@@ -35,7 +35,7 @@ Content-Type: application/json
 ###
 
 ### Login de usuario
-POST http://localhost:8000/api/users/login
+POST underlying-regan-immune-mvc-a0b35a6c.koyeb.app/api/users/login
 Content-Type: application/json
 
 {
