@@ -220,8 +220,8 @@ const getFuelStationById = async (req, res) => {
                         comment: review.comment,
                         rating: review.rating,
                         createdAt: review.createdAt,
-                        likesCount: review.likes?.length || 0,
-                        dislikesCount: review.dislikes?.length || 0
+                        likesCount: review.likes || [],
+                        dislikesCount: review.dislikes || []
                     });
                 }
             }
