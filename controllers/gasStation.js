@@ -45,13 +45,14 @@ const removeGasStationFromFavorites = async (req, res) => {
         if (!station) return res.status(404).send({ message: 'Gasolinera no encontrada' });
 
         const updatedUser = await userModel.updateOne(
-            userId,
+            { _id: userId },
             { $pull: { gasStatations: { gasStation: station._id } } },
             { new: true }
         );
 
         res.status(200).send(updatedUser);
     } catch (err) {
+        console.log(err);
         handleHttpError(res, 'ERROR_REMOVING_GASSTATION');
     }
 };
