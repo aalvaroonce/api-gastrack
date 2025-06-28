@@ -4,7 +4,7 @@ const {
     converterToFuelStationDto,
     haversine
 } = require('../utils/handleMaps');
-const { gasStationModel, gasPriceHistoryModel } = require('../models');
+const { gasStationModel, gasPriceHistoryModel, userModel } = require('../models');
 const moment = require('moment');
 
 const fuelTypeKeys = {
@@ -211,9 +211,12 @@ const getFuelStationById = async (req, res) => {
             for (const review of gasStation.reviews.reviewTexts) {
                 const rating = review.rating;
                 if (groupedReviews[rating]) {
+                    user = await userModel.findOne({ _id: review.user });
                     groupedReviews[rating].push({
                         _id: review._id,
-                        user: review.user,
+                        userName: user.name,
+                        userId: review.user,
+                        userAvatar: user.urlToAvatar || null,
                         comment: review.comment,
                         rating: review.rating,
                         createdAt: review.createdAt,
