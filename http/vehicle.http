@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTAyNDI3MTAsImV4cCI6MTc1MjgzNDcxMH0.4Qp7AN1BpFoE2GNf9Xvi_Cub4dx6uLovcDkGdRGOloE
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODVhN2MwNTdkN2ZiMWNhOWZiZjBmMjAiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MDc2MDQ4NiwiZXhwIjoxNzUzMzUyNDg2fQ.XnJBM3cg-nKiBMTv26kjJwPyGLRBzfSxWVllIhiJJ9w
 @vehicleId = 685295f16655a420928e3588
 
 ### Agregar vehículo
@@ -36,3 +36,15 @@ Authorization: Bearer {{token}}
 ### Eliminar vehículo 
 DELETE http://localhost:8000/api/vehicles/vehicleId
 Authorization: Bearer {{token}}
+
+
+ATCH https://underlying-regan-immune-mvc-a0b35a6c.koyeb.app/api/users/addimage
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=Boundry
+
+--Boundry
+Content-Disposition: form-data; name="image"; filename="spidernino.png"
+Content-Type: image/jpg
+
+< ./images/spidernino.jpg
+--Boundry--
