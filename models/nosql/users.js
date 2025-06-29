@@ -17,7 +17,7 @@ const UserScheme = new mongoose.Schema(
         notifications: { type: Boolean, default: true },
         deleted: { type: Boolean, default: false, select: false },
 
-        gasStatations: [
+        gasStations: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'gasStation'

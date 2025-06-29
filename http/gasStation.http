@@ -1,5 +1,6 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTAwNjkzOTcsImV4cCI6MTc1MjY2MTM5N30.Xj91sxPKMXHT2eOJzebj8vHSMrQuePFotq6jbYeW_Lw
-@host = http://localhost:8000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODYxOWM4OTgzZjI1YzMzNzE5NjUyN2EiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MTIyNzU3OCwiZXhwIjoxNzUzODE5NTc4fQ.UdbRD2mvzQyNmGADbSFjQmsODsg4E6cqlTnwPZ7Pksk
+
+@host = https://underlying-regan-immune-mvc-a0b35a6c.koyeb.app
 
 ### Añadir gasolinera a favoritos
 POST {{host}}/api/gasstation/favorite
@@ -7,7 +8,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "idEESS": "12604"
+  "idEESS": "6238"
 }
 
 ### Eliminar gasolinera de favoritos
@@ -16,7 +17,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "idEESS": "12345"
+  "idEESS": "6238"
 }
 
 ### Añadir o actualizar reseña
@@ -25,7 +26,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "idEESS": "12345",
+  "idEESS": "6238",
   "rating": 4,
   "comment": "Buena atención y precios competitivos"
 }
@@ -36,9 +37,17 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "idEESS": "12345"
+  "idEESS": "6238"
 }
 
-### Obtener gasolinera con historial
-GET {{host}}/api/gasstation/12345
+### Obtener gasolinera guardada
+GET {{host}}/api/gasstation/saved
+Authorization: Bearer {{token}}
+
+### Dar like
+PUT {{host}}/api/gasstation/6238/reviews/686038bdde2eecd4cfb2233c/like
+Authorization: Bearer {{token}}
+
+### Dar like
+PUT {{host}}/api/gasstation/6238/reviews/686038bdde2eecd4cfb2233c/dislike
 Authorization: Bearer {{token}}

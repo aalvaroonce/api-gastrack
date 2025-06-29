@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODI4OGY4MWE5NDYxNGYzZjVkZjM3ODEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTAyNDI3MTAsImV4cCI6MTc1MjgzNDcxMH0.4Qp7AN1BpFoE2GNf9Xvi_Cub4dx6uLovcDkGdRGOloE
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODYxOWM4OTgzZjI1YzMzNzE5NjUyN2EiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MTIyNzU3OCwiZXhwIjoxNzUzODE5NTc4fQ.UdbRD2mvzQyNmGADbSFjQmsODsg4E6cqlTnwPZ7Pksk
 @vehicleId = 685295f16655a420928e3588
 
 ### Agregar vehículo
@@ -36,3 +36,15 @@ Authorization: Bearer {{token}}
 ### Eliminar vehículo 
 DELETE http://localhost:8000/api/vehicles/vehicleId
 Authorization: Bearer {{token}}
+
+###
+PATCH http://localhost:8000/api/vehicles/68615959e83ae338c462dfab/image
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=Boundry
+
+--Boundry
+Content-Disposition: form-data; name="image"; filename="image.png"
+Content-Type: image/jpg
+
+< ./images/image.jpg
+--Boundry--

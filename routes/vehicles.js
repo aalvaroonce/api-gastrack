@@ -1,5 +1,11 @@
 const express = require('express');
-const { addVehicle, updateVehicle, deleteVehicle, addImage } = require('../controllers/vehicles');
+const {
+    addVehicle,
+    updateVehicle,
+    deleteVehicle,
+    addImage,
+    toggleDefaultVehicle
+} = require('../controllers/vehicles');
 const authMiddleware = require('../middleware/session');
 const {
     validatorAddVehicle,
@@ -50,7 +56,7 @@ router.post('/', authMiddleware, validatorAddVehicle, addVehicle);
  *   post:
  *     tags:
  *       - Vehicle
- *     summary: Sube o reemplaza una imagen del vehículo
+ *     summary: Cambia el vehiculo en default
  *     parameters:
  *       - name: id
  *         in: path
@@ -58,30 +64,9 @@ router.post('/', authMiddleware, validatorAddVehicle, addVehicle);
  *         description: ID del vehículo
  *         schema:
  *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               image:
- *                 type: string
- *                 format: binary
  *     responses:
  *       200:
  *         description: Imagen agregada exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: VEHICLE_IMAGE_UPDATED
- *                 url:
- *                   type: string
- *                   example: https://gateway.pinata.cloud/ipfs/Qm...
  *       404:
  *         description: Usuario o vehículo no encontrado
  *       500:
@@ -89,7 +74,7 @@ router.post('/', authMiddleware, validatorAddVehicle, addVehicle);
  *     security:
  *       - bearerAuth: []
  */
-router.patch('/:id/image', authMiddleware, validatorId, addImage);
+router.patch('/toggleDefault', authMiddleware, validatorId, toggleDefaultVehicle);
 
 /**
  * @openapi

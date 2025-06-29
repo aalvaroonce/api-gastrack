@@ -1,5 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODVhN2MwNTdkN2ZiMWNhOWZiZjBmMjAiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MDc2MDQ4NiwiZXhwIjoxNzUzMzUyNDg2fQ.XnJBM3cg-nKiBMTv26kjJwPyGLRBzfSxWVllIhiJJ9w
-@admin_token =  
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODYxOWM4OTgzZjI1YzMzNzE5NjUyN2EiLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MTIyNzU3OCwiZXhwIjoxNzUzODE5NTc4fQ.UdbRD2mvzQyNmGADbSFjQmsODsg4E6cqlTnwPZ7Pksk
 
 
 
@@ -52,13 +51,13 @@ PATCH http://localhost:8000/api/users/restore/USERs_ID
 Authorization: Bearer {{admin_token}}
 
 ### ADD IMAGE TO USERs (requires token)
-PATCH http://localhost:8000/api/users/addimage
+PATCH https://underlying-regan-immune-mvc-a0b35a6c.koyeb.app/api/users/addimage
 Authorization: Bearer {{token}}
 Content-Type: multipart/form-data; boundary=Boundry
 
 --Boundry
-Content-Disposition: form-data; name="image"; filename="cerberus.png"
-Content-Type: image/jpeg
+Content-Disposition: form-data; name="image"; filename="spidernino.png"
+Content-Type: image/jpg
 
-< ./images/cerberus.png
+< ./images/spidernino.jpg
 --Boundry--
