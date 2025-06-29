@@ -23,16 +23,16 @@ const checkLowPricesAndNotify = async () => {
 
         const users = await userModel
             .find({
-                gasStatations: { $exists: true, $not: { $size: 0 } }
+                gasStations: { $exists: true, $not: { $size: 0 } }
             })
-            .populate('gasStatations');
+            .populate('gasStations');
 
         let notificationsSent = 0;
 
         for (const user of users) {
             const preferredFuelTypes = getUserPreferredFuelTypes(user);
 
-            for (const gasStation of user.gasStatations) {
+            for (const gasStation of user.gasStations) {
                 try {
                     const priceHistory = await gasPriceHistoryModel
                         .find({ gasStation: gasStation._id })
@@ -103,7 +103,7 @@ const stopLowPriceNotifications = () => {
 // Función para probar el sistema manualmente con un usuario específico
 const testNotificationForUser = async userEmail => {
     try {
-        const user = await userModel.findOne({ email: userEmail }).populate('gasStatations');
+        const user = await userModel.findOne({ email: userEmail }).populate('gasStations');
         if (!user) {
             console.log('Usuario no encontrado');
             return;

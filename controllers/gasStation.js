@@ -12,14 +12,15 @@ const saveGasStationToFavorites = async (req, res) => {
         if (!station) return res.status(404).send('GASSTATION_NOT_FOUND');
 
         const user = await userModel.findById(userId);
-        const alreadyFavorite = user.gasStatations.some(
+        const alreadyFavorite = user.gasStations.some(
             stationId => stationId.toString() === station._id.toString()
         );
+
         if (alreadyFavorite) return res.status(409).send('GASSTATION_ALREADY_IN_FAVORITES');
 
         const updatedUser = await userModel.updateOne(
             { _id: userId },
-            { $addToSet: { gasStatations: station._id } }
+            { $addToSet: { gasStations: station._id } }
         );
 
         await gasStationModel.findOneAndUpdate(
@@ -46,7 +47,7 @@ const removeGasStationFromFavorites = async (req, res) => {
 
         const updatedUser = await userModel.updateOne(
             { _id: userId },
-            { $pull: { gasStatations: { gasStation: station._id } } },
+            { $pull: { gasStations: station._id } },
             { new: true }
         );
 
@@ -124,15 +125,15 @@ const getSavedGasStations = async (req, res) => {
         const { name } = req.query;
 
         const user = await userModel.findById(userId).populate({
-            path: 'gasStatations',
+            path: 'gasStations',
             match: name ? { brand: { $regex: name, $options: 'i' } } : {}
         });
 
-        if (!user || !user.gasStatations || user.gasStatations.length === 0) {
+        if (!user || !user.gasStations || user.gasStations.length === 0) {
             return res.status(404).send('NOT_SAVED_GASSTATIONS');
         }
 
-        res.status(200).send(user.gasStatations);
+        res.status(200).send(user.gasStations);
     } catch (err) {
         console.error(err);
         handleHttpError(res, 'ERROR_FETCHING_STATION_HISTORY');
